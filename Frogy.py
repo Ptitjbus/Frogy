@@ -3,6 +3,7 @@ from Log import *
 from FrogyThread import *
 from GPT import *
 import json
+from Speaker import *
 
 
 class Frogy:
@@ -13,10 +14,11 @@ class Frogy:
         self.testMode = testMode #mock
         self.gpt = ChatGPT(self.backend)
         self.frogyThread = FrogyThread(self.backend)
+        self.speaker = Speaker()
+        self.currentTipsId = 0
         # Chat GPT
         # Backend
         # Watcher
-        # Speaker
 
 
     def start(self):
@@ -59,7 +61,7 @@ class Frogy:
 
         # send tips tts request
         if( not self.testMode and gptresponse["tips"]):
-            self.backend.speaker.generateTips(gptresponse["tips"])
+            self.speaker.generateTips(gptresponse["tips"])
             self.backend.addTipsFunction(gptresponse["tips"])
         else:     
             printDanger("Erreur lors de la lecture des tips")
@@ -67,3 +69,32 @@ class Frogy:
     def launchTests(self):
         test = Test(self.server)
         test.runTest()
+
+    def hardwareCallback(self, callback):
+        if(callback['input'] == 'wheel'):
+            if(callback['type'] == 'rotation'):
+                if(callback['state'] == 'up'):
+                    self.backend.moveSelectionUp.emit()
+                elif(callback['state'] == 'down'):
+                    self.backend.moveSelectionDown.emit()
+            elif(callback['type'] == 'click'):
+                self.backend.encoderButtonClicked.emit()
+        elif(callback['input'] == 'button'):
+            if(callback['type'] == 'return'):
+                self.backend.returnBtnFunction()
+            elif(callback['type'] == 'tips'):
+                
+                if(self.speaker.ready):
+                    self.backend.displayTips.emit(self.currentTipsId)
+                else:
+                    self.backend.displayTips.emit(9999)
+
+                self.speaker.say(self.currentTipsId)
+                    
+                if(self.currentTipsId == len(self.speaker.tipsFiles) - 1):
+                    self.currentTipsId = 0
+                else:
+                    self.currentTipsId += 1
+
+    def phoneCallback(self, callback):
+        pass

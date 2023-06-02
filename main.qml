@@ -467,6 +467,7 @@ Window {
 
 
         function onEncoderButtonClicked() {
+            console.log("wheel click")
             var currentIndex = listView.currentIndex
 
             if(!itemDetail.visible){
@@ -484,6 +485,7 @@ Window {
         }
 
         function onReturnBtn() {
+            console.log("return")
             if(itemDetail.visible){
                 if(infoPopup.visible){
                     infoPopup.visible = false
@@ -496,10 +498,12 @@ Window {
         }
 
         function onMoveSelectionUp() {
+            console.log("up")
             listView.moveSelectionUp()
         }
 
         function onMoveSelectionDown() {
+            console.log("down")
             listView.moveSelectionDown()
         }
 
@@ -548,6 +552,7 @@ Window {
         }
 
         function onDisplayTips(id){
+            console.log("tips")
             console.log(id, typeof(id))
             if(id !== 9999){
                 tipsPopup.visible = true

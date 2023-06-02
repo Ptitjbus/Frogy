@@ -26,7 +26,7 @@ class ServerWS(QThread):
 
     def run(self):
         adress = self.host+":"+str(self.port)
-        printInfo("Server started at : "+adress)
+        printInfo(f"Server started at : {adress}")
         self.server.run_forever()
     
     def stop(self):
@@ -38,14 +38,14 @@ class ServerWS(QThread):
     def new_client(self,client, server):
         dt = datetime.now()
         str_date_time = dt.strftime("%H:%M:%S")
-        printInfo(str_date_time+": New client connected and was given id %d" % client['id'])
+        printInfo("Client connected")
         return {'client': client, 'time': str_date_time, 'state': 'connected'}
 
     # Called for every client disconnecting
     def client_left(self,client, server):
         dt = datetime.now()
         str_date_time = dt.strftime("%H:%M:%S")
-        printInfo("Client(%d) disconnected" % client['id'])
+        printInfo("Client disconnected")
         return {'client': client, 'time': str_date_time, 'state': 'disconnected'}
 
     def addMessageFunction(self, function):
@@ -57,4 +57,4 @@ class ServerWS(QThread):
         self.lastMessage = message
         if len(message) > 200:
             message = message[:200]+'..'
-        printInfo("Client(%d) said: %s" % (client['id'], message))
+        printInfo(f"Client({client['id']}) said: {message}")

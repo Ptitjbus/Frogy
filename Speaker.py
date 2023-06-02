@@ -6,8 +6,7 @@ import re
 
 class Speaker:
 
-    def __init__(self,backend) -> None:
-        self.backend = backend
+    def __init__(self) -> None:
         self.tipsFiles = []
         self.ready = False
         pygame.mixer.init()
@@ -21,7 +20,6 @@ class Speaker:
                 subprocess.run(command, stdout=outfile)
             counter += 1
 
-        self.backend.changeFrogyFace("thinking")
         printSuccess("Génération des tips terminé")
         self.ready = True
 
@@ -40,7 +38,6 @@ class Speaker:
         return int(re.search(r'\d+', fichier).group())
     
     def say(self,tipsId):
-        self.backend.changeFrogyFace("idle")
         tipsList = self.getTips()
         if(tipsList != False):
             pygame.mixer.music.load(f"tips/{self.tipsFiles[tipsId]}")
@@ -48,4 +45,7 @@ class Speaker:
 
             while pygame.mixer.music.get_busy() == True:
                 continue
+
+        
+        
 
