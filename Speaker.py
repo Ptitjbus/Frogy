@@ -1,5 +1,5 @@
 import subprocess
-from Alert import *
+from Log import *
 import os
 import pygame
 import re
@@ -8,7 +8,6 @@ class Speaker:
 
     def __init__(self,backend) -> None:
         self.backend = backend
-        self.alert = AlertDelegate()
         self.tipsFiles = []
         self.ready = False
         pygame.mixer.init()
@@ -23,9 +22,8 @@ class Speaker:
             counter += 1
 
         self.backend.changeFrogyFace("thinking")
-        self.alert.success("Génération des tips terminé")
+        printSuccess("Génération des tips terminé")
         self.ready = True
-        print('SPEAKER READY', self.ready)
 
     def getTips(self):
         self.tipsFiles = []

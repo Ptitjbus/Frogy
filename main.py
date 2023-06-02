@@ -74,7 +74,6 @@ class Backend(QObject):
         else:
             self.displayTips.emit(9999)
         
-        print(self.currentTipsId, len(self.speaker.tipsFiles) - 1, type(self.currentTipsId), type(len(self.speaker.tipsFiles)))
         if(self.currentTipsId == len(self.speaker.tipsFiles) - 1):
             self.currentTipsId = 0
         else:

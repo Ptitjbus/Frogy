@@ -1,5 +1,5 @@
 from Tests import *
-from Alert import *
+from Log import *
 from FrogyThread import *
 from GPT import *
 import json
@@ -13,7 +13,11 @@ class Frogy:
         self.testMode = testMode #mock
         self.gpt = ChatGPT(self.backend)
         self.frogyThread = FrogyThread(self.backend)
-        self.alertDelegate = AlertDelegate()
+        # Chat GPT
+        # Backend
+        # Watcher
+        # Speaker
+
 
     def start(self):
         self.server.start()
@@ -45,23 +49,21 @@ class Frogy:
                 messageResult["date"], messageResult["list"]
             )
 
-        print(gptresponse)
         # update frogy display
         if(gptresponse["list"]):
             for elem in gptresponse["list"]:
                 self.backend.addItem(elem)
             self.backend.sortListByDate()
         else:
-            self.alertDelegate.danger("Erreur lors de la lecture des réponses de GPT")
+            printDanger("Erreur lors de la lecture des réponses de GPT")
 
         # send tips tts request
         if( not self.testMode and gptresponse["tips"]):
-            print(gptresponse["tips"])
             self.backend.speaker.generateTips(gptresponse["tips"])
             self.backend.addTipsFunction(gptresponse["tips"])
         else:     
-            self.alertDelegate.danger("Erreur lors de la lecture des tips")
+            printDanger("Erreur lors de la lecture des tips")
 
     def launchTests(self):
-        test = Test(self.server, self.alertDelegate)
+        test = Test(self.server)
         test.runTest()

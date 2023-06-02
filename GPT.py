@@ -1,7 +1,7 @@
 import json
 import openai
 import re
-from Alert import *
+from Log import *
 
 
 class ChatGPT:
@@ -13,7 +13,6 @@ class ChatGPT:
     def __init__(self, backend):
         self.second = True
         self.tentativeCounter = 0
-        self.alert = AlertDelegate()
         self.backend = backend
 
     def send_prompt(self, prompt):
@@ -24,7 +23,7 @@ class ChatGPT:
                 model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}]
             )
         except Exception as e:
-            self.alert.danger(f"Request Failed", e)
+            printDanger(f"Request Failed", e)
             return
 
         try:
@@ -34,18 +33,18 @@ class ChatGPT:
                 raise Exception("Erreur lors de la récupération JSON")
 
             self.backend.changeFrogyFace("idle")
-            self.alert.success(f"La requête à été correctement reçue", response)
+            printSuccess(f"La requête à été correctement reçue", response)
             return response
         except Exception as e:
-            self.alert.danger(
+            printDanger(
                 f"La requête à échouée", f"Réponse :{completion}\n\nCode erreur : {e}"
             )
             if self.tentativeCounter <= 3:
-                self.alert.warning(f"Nouvelle tentative ({self.tentativeCounter})")
+                printWarning(f"Nouvelle tentative ({self.tentativeCounter})")
                 self.tentativeCounter += 1
                 self.send_prompt(prompt)
 
-            self.alert.danger("Le nombre de tentatives maximum est dépassé")
+            printDanger("Le nombre de tentatives maximum est dépassé")
 
     def getJSON(self, string):
         match = re.search("```(.*?)```", string, re.DOTALL)
@@ -53,7 +52,7 @@ class ChatGPT:
         if match:
             string = match.group(1)
         else:
-            self.alert.warning(
+            printWarning(
                 f"Aucun JSON formaté dans la chaîne de caractères.", string
             )
 
@@ -61,7 +60,7 @@ class ChatGPT:
             data = json.loads(string)
             return data
         except json.JSONDecodeError as e:
-            self.alert.danger(f"Erreur lors de la conversion en JSON.", e)
+            printDanger(f"Erreur lors de la conversion en JSON.", e)
             return None
 
     def updateListPrompt(self, list):
@@ -84,6 +83,6 @@ class ChatGPT:
             + itemlist
             + "."
         )
-        self.alert.warning("Lancement prompt chatGPT")
+        printWarning("Lancement prompt chatGPT")
         self.backend.changeFrogyFace("loading")
         return self.send_prompt(prompt)

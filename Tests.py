@@ -4,12 +4,12 @@ import websocket
 import socket
 import time
 from wsServer import *
+from Log import *
 
 
 class Test:
-    def __init__(self, server, alertDelegate) -> None:
+    def __init__(self, server) -> None:
         self.isConnected = False
-        self.alertDelegate = alertDelegate
         self.isCommunication = False
         self.server = server
         self.currentTestState = ConnexionTest(self)
@@ -23,7 +23,7 @@ class Test:
         self.currentTestState.context = self
 
     def alertState(self, state):
-        self.alertDelegate.alertPrint(state)
+        alertPrint(state)
 
 
 class TestStates:
@@ -70,7 +70,7 @@ class CommunicationTest(TestStates):
 
             # self.context.updateState(RotaryTest(self))
             # self.context.runTest()
-            print(f"{self.GREEN}Tests terminés {self.RESET}")
+            printSuccess("Tests terminés")
         except Exception as e:
             self.error = e
             self.context.alertState(self)
@@ -90,26 +90,20 @@ class RotaryTest(TestStates):
         self.isClkLeft = False
 
     def runTest(self):
-        # try:
         GPIO.add_event_detect(
             self.SW_PIN, GPIO.FALLING, callback=self.swCallbackTest, bouncetime=300
         )
         GPIO.add_event_detect(
             self.CLK_PIN, GPIO.BOTH, callback=self.rotationCallbackTest, bouncetime=2
         )
-        # except Exception as e:
-        #     print(e)
-        #     self.error = f"Erreur  d'initialistation de la molette. {e}"
 
-        print("Début des tests de molette")
+        printInfo("Début des tests de molette")
         start_time = time.time()
         while time.time() - start_time < 5:
-            # code
-            # print(self.isClkRight)
             pass
 
     def swCallbackTest(self, channel):
-        print("Molette pressed")
+        printInfo("Molette pressed")
 
     def rotationCallbackTest(self, channel):
         global clkLastState
@@ -119,10 +113,10 @@ class RotaryTest(TestStates):
         if clkState != clkLastState:
             if dtState == 1 and clkState == 0:  # UP
                 self.isClkRight = True
-                print("right")
+                printInfo("right")
                 # pass
             elif dtState == 1 and clkState == 1:  # DOWN
-                print("left")
+                printInfo("left")
                 self.isClkLeft = True
                 # pass
         clkLastState = clkState

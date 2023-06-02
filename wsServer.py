@@ -2,6 +2,7 @@ from websocket_server import WebsocketServer
 from datetime import datetime
 import socket
 from PySide2.QtCore import QThread
+from Log import *
 
 class ServerWS(QThread):
     def __init__(self,port):
@@ -20,12 +21,12 @@ class ServerWS(QThread):
                 local_ip = s.getsockname()[0]
             return local_ip
         except Exception as e:
-            print("Erreur lors de la récupération de l'adresse IP locale :", e)
+            printDanger("Erreur lors de la récupération de l'adresse IP locale : "+ e)
             return None
 
     def run(self):
         adress = self.host+":"+str(self.port)
-        print("Server started at : "+adress)
+        printInfo("Server started at : "+adress)
         self.server.run_forever()
     
     def stop(self):
@@ -37,14 +38,14 @@ class ServerWS(QThread):
     def new_client(self,client, server):
         dt = datetime.now()
         str_date_time = dt.strftime("%H:%M:%S")
-        print(str_date_time+": New client connected and was given id %d" % client['id'])
+        printInfo(str_date_time+": New client connected and was given id %d" % client['id'])
         return {'client': client, 'time': str_date_time, 'state': 'connected'}
 
     # Called for every client disconnecting
     def client_left(self,client, server):
         dt = datetime.now()
         str_date_time = dt.strftime("%H:%M:%S")
-        print("Client(%d) disconnected" % client['id'])
+        printInfo("Client(%d) disconnected" % client['id'])
         return {'client': client, 'time': str_date_time, 'state': 'disconnected'}
 
     def addMessageFunction(self, function):
@@ -56,4 +57,4 @@ class ServerWS(QThread):
         self.lastMessage = message
         if len(message) > 200:
             message = message[:200]+'..'
-        print("Client(%d) said: %s" % (client['id'], message))
+        printInfo("Client(%d) said: %s" % (client['id'], message))

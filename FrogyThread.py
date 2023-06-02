@@ -2,6 +2,7 @@ import threading
 import time
 from datetime import datetime, timedelta
 import json
+from Log import *
 
 class FrogyThread(threading.Thread):
 
@@ -17,7 +18,7 @@ class FrogyThread(threading.Thread):
         self.emote = "idle"
         
     def run(self):
-        print(f"{self.YELLOW}Frogy thread started{self.RESET}")
+        printWarning("Frogy thread started")
         self.clock = datetime.now()
         while self.running:
             self.backend.getListData() #Lance la fonction de récupération des infos
@@ -43,7 +44,7 @@ class FrogyThread(threading.Thread):
 
     def stop(self):
         if(self.running):
-            print(f"{self.YELLOW}Frogy thread stopped{self.RESET}")
+            printWarning("Frogy thread stopped")
             self.running = False
 
     def calculateDays(self, dateAdded, dateCurrent, conservationDays):
