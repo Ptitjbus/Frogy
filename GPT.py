@@ -84,5 +84,5 @@ class ChatGPT:
             + "."
         )
         printWarning("Lancement prompt chatGPT")
-        self.backend.changeDisplayLoadingScreen(True)
+        self.backend.changeDisplayLoadingSyncScreen()
         return self.send_prompt(prompt)

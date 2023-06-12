@@ -3,7 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
 
-Item {
+Item {  
     id: syncScreenItem
     width: 1024
     height: 600
@@ -11,13 +11,12 @@ Item {
 
     Rectangle {
         id: syncScreen
-        color: "blue"
+        color: "#50E28B"
         anchors.fill: parent
-        visible: true
-        z:1
+        visible: false
+        z:2
 
         Rectangle {
-            id: circleBg
             color: "#2E524518"
             width: 350
             height: width
@@ -30,20 +29,44 @@ Item {
 
                 PropertyAnimation {
                     to: 350
-                    duration: 1000
+                    duration: 300
                     easing.type: Easing.InOutQuad
                 }
 
                 PropertyAnimation {
                     to: 400
-                    duration: 1000
+                    duration: 300
+                    easing.type: Easing.InOutQuad
+                }
+
+                PropertyAnimation {
+                    to: 350
+                    duration: 300
+                    easing.type: Easing.InOutQuad
+                }
+
+                PropertyAnimation {
+                    to: 400
+                    duration: 300
+                    easing.type: Easing.InOutQuad
+                }
+
+                PropertyAnimation {
+                    to: 350
+                    duration: 300
+                    easing.type: Easing.InOutQuad
+                }
+
+                PropertyAnimation {
+                    to: 400
+                    duration: 2000
                     easing.type: Easing.InOutQuad
                 }
             }
         }
 
         Rectangle {
-            id: circle
+            id: circleSuccess
             color: "#2E5245"
             width: 350
             height: width
@@ -53,16 +76,31 @@ Item {
         }
 
         Text {
-            id: syncingText
             text: "Synchronisation en cours"
             anchors.centerIn: parent
-            width: circle.width-100
+            width: circleSuccess.width-100
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             color: "white"
             font.pixelSize: 30
             font.bold: true
+        }
+
+        Text {
+            id: waitingText
+            text: "Succès ! Frogy est synchronisé !"
+            font.bold:true
+            color: "#2E5245"
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            anchors {
+                top: circleSuccess.bottom
+                topMargin: 50
+                horizontalCenter: parent.horizontalCenter
+            }
+            font.pixelSize: 30
+            z: 2
         }
     }
 }

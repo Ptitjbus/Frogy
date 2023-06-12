@@ -51,8 +51,9 @@ class Frogy:
             for elem in gptresponse["list"]:
                 self.backend.addItem(elem)
             self.backend.sortListByDate()
-            self.backend.changeDisplayLoadingScreen(False)
+            self.backend.changeDisplayResultSyncScreen(True)
         else:
+            self.backend.changeDisplayResultSyncScreen(False)
             printDanger("Erreur lors de la lecture des réponses de GPT")
 
         # send tips tts request
@@ -92,6 +93,3 @@ class Frogy:
                     self.currentTipsId = 0
                 else:
                     self.currentTipsId += 1
-
-    def phoneCallback(self, callback):
-        pass

@@ -11,66 +11,8 @@ Window {
     visible: true    
 
     property var tips: []
-    property var isCircleVisible
-
-    Circle{isVisible:isCircleVisible}
-
-    // Rectangle {
-    //     id: syncScreen
-    //     color: "white"
-    //     anchors.fill: parent
-    //     visible: false
-    //     z:1
-
-    //     Rectangle {
-    //         id: circleBg
-    //         color: "#2E524518"
-    //         width: 350
-    //         height: width
-    //         anchors.centerIn: parent
-    //         radius: width / 2
-
-    //         SequentialAnimation on width {
-    //             loops: Animation.Infinite
-    //             running: true
-
-    //             PropertyAnimation {
-    //                 to: 350
-    //                 duration: 1000
-    //                 easing.type: Easing.InOutQuad
-    //             }
-
-    //             PropertyAnimation {
-    //                 to: 400
-    //                 duration: 1000
-    //                 easing.type: Easing.InOutQuad
-    //             }
-    //         }
-    //     }
-
-    //     Rectangle {
-    //         id: circle
-    //         color: "#2E5245"
-    //         width: 350
-    //         height: width
-    //         anchors.centerIn: parent
-    //         radius: width / 2
-    //         border.color: "#2E524518"
-    //     }
-
-    //     Text {
-    //         id: syncingText
-    //         text: "Synchronisation en cours"
-    //         anchors.centerIn: parent
-    //         width: circle.width-100
-    //         wrapMode: Text.Wrap
-    //         horizontalAlignment: Text.AlignHCenter
-    //         verticalAlignment: Text.AlignVCenter
-    //         color: "white"
-    //         font.pixelSize: 30
-    //         font.bold: true
-    //     }
-    // }
+    property var isSynchronisationLoadingVisible : false
+    property var isSynchronisationSuccessVisible : false
 
     RowLayout {
         anchors.fill: parent
@@ -80,10 +22,12 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: 2 * window.width / 5
+            
 
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                
 
                 Image {
                     id: frogyFace
@@ -298,7 +242,8 @@ Window {
 
     }
 
-    
+    SynchronisationLoading{isVisible:isSynchronisationLoadingVisible}
+    SynchronisationSuccess{isVisible:isSynchronisationSuccessVisible}
 
     Connections {
         target: backend
@@ -342,7 +287,17 @@ Window {
         }
 
         function onReturnBtn() {
-            infoPopup.visible = false
+            if(window.isSynchronisationSuccessVisible){
+                window.isSynchronisationSuccessVisible = false
+            }
+
+            if(tipsPopup.visible){
+                tipsPopup.visible = false
+            }
+
+            if(infoPopup.visible){
+                infoPopup.visible = false
+            }
         }
 
         function onMoveSelectionUp() {
@@ -406,12 +361,15 @@ Window {
             }
         }
 
-        function onDisplayLoadingScreen(state){
-            window.isCircleVisible = state
+        function onDisplayLoadingSyncScreen(){
+            window.isSynchronisationLoadingVisible = true
         }
 
-        function onDisplayValidSyncScreen(){
-            syncScreen.visible = true
+        function onDisplayResultSyncScreen(state){
+            window.isSynchronisationLoadingVisible = false
+            if(state){
+                window.isSynchronisationSuccessVisible = true
+            }
         }
 
     }
