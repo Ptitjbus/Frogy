@@ -5,14 +5,16 @@ from PySide2.QtCore import QThread
 from Log import *
 
 class ServerWS(QThread):
-    def __init__(self,port):
+    def __init__(self,onMessageCallback):
         super().__init__()
-        self.port = port
+        self.port = 8081
         self.host = self.get_local_ip_address()
-        self.server = WebsocketServer(host= self.host,port = port)
+        self.onMessageCallback = onMessageCallback
+        self.server = WebsocketServer(host= self.host,port = self.port)
         self.server.set_fn_new_client(self.new_client)
         self.server.set_fn_client_left(self.client_left)
         self.server.set_fn_message_received(self.message_received)
+        self.start()
 
     def get_local_ip_address(self):
         try:
@@ -48,12 +50,9 @@ class ServerWS(QThread):
         printInfo("Client disconnected")
         return {'client': client, 'time': str_date_time, 'state': 'disconnected'}
 
-    def addMessageFunction(self, function):
-        self.functionToExeWhenMessReceived = function
-
     # Called when a client sends a message
     def message_received(self,client, server, message):
-        self.functionToExeWhenMessReceived(message)
+        self.onMessageCallback(message)
         self.lastMessage = message
         if len(message) > 200:
             message = message[:200]+'..'

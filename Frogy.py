@@ -4,25 +4,20 @@ from FrogyThread import *
 from GPT import *
 import json
 from Speaker import *
-
+from Backend import *
 
 class Frogy:
-    def __init__(self, server, backend, testMode=False) -> None:
-        self.server = server
-        self.server.addMessageFunction(self.onMessageCallback)
-        self.backend = backend
-        self.testMode = testMode #mock
+    def __init__(self, engine) -> None:
+        self.testMode = False #mock
+        self.engine = engine
+        self.backend = Backend(self.engine)
         self.gpt = ChatGPT(self.backend)
         self.frogyThread = FrogyThread(self.backend)
         self.speaker = Speaker()
         self.currentTipsId = 0
-        # Chat GPT
-        # Backend
-        # Watcher
-
+        engine.rootContext().setContextProperty("backend", self.backend)
 
     def start(self):
-        self.server.start()
         self.frogyThread.start()
         if self.testMode == True:
             self.launchTests()
@@ -67,8 +62,9 @@ class Frogy:
             printDanger("Erreur lors de la lecture des tips")
 
     def launchTests(self):
-        test = Test(self.server)
-        test.runTest()
+        pass
+        # test = Test(self.server)
+        # test.runTest()
 
     def hardwareCallback(self, callback):
         if(callback['input'] == 'wheel'):

@@ -11,7 +11,7 @@ class Test:
     def __init__(self, server) -> None:
         self.isConnected = False
         self.isCommunication = False
-        self.server = server
+        self.server = ServerWS()
         self.currentTestState = ConnexionTest(self)
         self.currentTestState.context = self
 
