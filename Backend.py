@@ -14,6 +14,7 @@ class Backend(QObject):
     updateListItems = Signal(str)
     addTips = Signal(list)
     displayTips = Signal(int)
+    displayLoadingScreen = Signal(bool)
 
     def __init__(self, engine):
         super().__init__()
@@ -59,3 +60,6 @@ class Backend(QObject):
 
     def displayTipsFunction(self, tipsId):
         self.displayTips.emit(tipsId)
+    
+    def changeDisplayLoadingScreen(self,state):
+        self.displayLoadingScreen.emit(state)

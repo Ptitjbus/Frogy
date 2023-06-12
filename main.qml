@@ -10,8 +10,67 @@ Window {
     title: qsTr("Frogy")
     visible: true    
 
-    property var itemDetail
     property var tips: []
+    property var isCircleVisible
+
+    Circle{isVisible:isCircleVisible}
+
+    // Rectangle {
+    //     id: syncScreen
+    //     color: "white"
+    //     anchors.fill: parent
+    //     visible: false
+    //     z:1
+
+    //     Rectangle {
+    //         id: circleBg
+    //         color: "#2E524518"
+    //         width: 350
+    //         height: width
+    //         anchors.centerIn: parent
+    //         radius: width / 2
+
+    //         SequentialAnimation on width {
+    //             loops: Animation.Infinite
+    //             running: true
+
+    //             PropertyAnimation {
+    //                 to: 350
+    //                 duration: 1000
+    //                 easing.type: Easing.InOutQuad
+    //             }
+
+    //             PropertyAnimation {
+    //                 to: 400
+    //                 duration: 1000
+    //                 easing.type: Easing.InOutQuad
+    //             }
+    //         }
+    //     }
+
+    //     Rectangle {
+    //         id: circle
+    //         color: "#2E5245"
+    //         width: 350
+    //         height: width
+    //         anchors.centerIn: parent
+    //         radius: width / 2
+    //         border.color: "#2E524518"
+    //     }
+
+    //     Text {
+    //         id: syncingText
+    //         text: "Synchronisation en cours"
+    //         anchors.centerIn: parent
+    //         width: circle.width-100
+    //         wrapMode: Text.Wrap
+    //         horizontalAlignment: Text.AlignHCenter
+    //         verticalAlignment: Text.AlignVCenter
+    //         color: "white"
+    //         font.pixelSize: 30
+    //         font.bold: true
+    //     }
+    // }
 
     RowLayout {
         anchors.fill: parent
@@ -115,7 +174,7 @@ Window {
                                         font.bold: true
                                         anchors.centerIn: parent
 
-                                        color: { return model.getTextColor();}
+                                        color: "#2E5245"
 
                                         text: {
                                             if (model.dateRemaining < 0)
@@ -160,195 +219,6 @@ Window {
                         width: 15
                     }
                 }
-
-                Rectangle {
-                    id: itemDetail
-                    width: listView.width
-                    height: listView.height
-                    color: "#FBF4E8"
-                    property string index
-                    property string name
-                    property string dateAdded
-                    property string dateRemaining
-                    visible: false
-
-                    RowLayout {
-                        id: itemDetailHeader
-                        anchors.margins: 10
-                        width: listView.width
-                        height: 100
-
-                        Item {
-                            id: textContainer
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            Layout.fillWidth: true
-                            Layout.maximumWidth: 350
-                            Layout.fillHeight: true
-                            
-                            Text {
-                                id: nameLabel
-                                width: parent.width
-                                text: itemDetail.name                                        
-                                font.pixelSize: 35
-                                font.bold: true
-                                wrapMode: Text.WordWrap
-                                height: contentHeight  // Laisser la hauteur s'ajuster automatiquement.
-                                verticalAlignment: Text.AlignVCenter // Aligner verticalement.
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        Rectangle {
-                            id: dateDetailLabel
-                            radius: 10
-                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                            width: textDetailLabel.width + 20
-                            Layout.preferredHeight: 50
-                            color: {
-                                if (itemDetail.dateRemaining < 0)
-                                    return "#F87171";
-                                else if (itemDetail.dateRemaining == 0)
-                                    return "#FDBA74";
-                                else if (itemDetail.dateRemaining >= 1 && itemDetail.dateRemaining <= 3)
-                                    return "#FFE76B";
-                                else 
-                                    return "#CBD5E1";
-                            }
-
-                            Text {
-                                id: textDetailLabel
-                                font.pixelSize: 30
-                                font.bold: true
-                                anchors.centerIn: parent
-
-                                color: {
-                                    if (itemDetail.dateRemaining < 0)
-                                        return "#450A0A";
-                                    else if (itemDetail.dateRemaining == 0)
-                                        return "#431407";
-                                    else if (itemDetail.dateRemaining >= 1 && itemDetail.dateRemaining <= 3)
-                                        return "#422006";
-                                    else 
-                                        return "#1E293B";
-                                }
-
-                                text: {
-                                    if (itemDetail.dateRemaining < 0)
-                                        return "A vérifier";
-                                    else if (itemDetail.dateRemaining == 0)
-                                        return "Moins de 24h";
-                                    else if (itemDetail.dateRemaining >= 1 && itemDetail.dateRemaining <= 3)
-                                        return "1 à 3 jours";
-                                    else if (itemDetail.dateRemaining >= 4 && itemDetail.dateRemaining <= 7)
-                                        return "4 à 7 jours";
-                                    else if (itemDetail.dateRemaining >= 8 && itemDetail.dateRemaining <= 14)
-                                        return "1 à 2 semaines";
-                                    else if (itemDetail.dateRemaining >= 15 && itemDetail.dateRemaining <= 28)
-                                        return "2 à 4 semaines";
-                                    else if (itemDetail.dateRemaining >= 29 && itemDetail.dateRemaining <= 90)
-                                        return "1 à 3 mois";
-                                    else if (itemDetail.dateRemaining > 90)
-                                        return "> 3 mois";
-                                }
-                            }
-                        }                        
-                    }
-
-                    Rectangle {
-                        id: dateAddedDetailContainer
-                        width: listView.width - 60 // Adjusting for margin
-                        height: 110
-                        color: "white"
-                        anchors.top: itemDetailHeader.bottom
-                        anchors.topMargin: 30
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        radius: 5
-
-                        Text {
-                            id: dateAddedLabel
-                            anchors {
-                                left: parent.left
-                                leftMargin: 30
-                                top: parent.top
-                                topMargin: 15
-                            }
-                            text: "Ajouté le :"
-                            font.pixelSize: 25
-                            font.bold: true
-                        }
-
-                        Text {
-                            id: dateAddedValue
-                            anchors {
-                                left: parent.left
-                                leftMargin: 30
-                                top: dateAddedLabel.bottom
-                            }
-                            text: itemDetail.dateAdded
-                            font.pixelSize: 30
-                            font.bold: true
-                        }
-                    }
-
-                    Rectangle {
-                        id: dataRemainingDetailContainer
-                        width: listView.width - 60 // Adjusting for margin
-                        height: 110
-                        color: "white"
-                        anchors.top: dateAddedDetailContainer.bottom
-                        anchors.topMargin: 30
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        radius: 5
-
-                        Text {
-                            id: dateRemainingLabel
-                            anchors {
-                                left: parent.left
-                                leftMargin: 30
-                                top: parent.top
-                                topMargin: 15
-                            }
-                            text: "Temps initial de conservation estimé :"
-                            font.pixelSize: 25
-                            font.bold: true
-                        }
-
-                        Text {
-                            id: dateRemainingValue
-                            anchors {
-                                left: parent.left
-                                leftMargin: 30
-                                top: dateRemainingLabel.bottom
-                            }
-                            text: itemDetail.dateRemaining
-                            font.pixelSize: 30
-                            font.bold: true
-                        }
-                    }  
-
-                    Rectangle {
-                        id: removeBtnContainer
-                        width: listView.width - 60 // Adjusting for margin
-                        height: 110
-                        color: "#F87171"
-                        anchors.top: dataRemainingDetailContainer.bottom
-                        anchors.topMargin: 30
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        border.width: 2
-                        border.color: "#485877"                            
-                        radius: 5
-
-                        Text {
-                            id: removeBtnLabel  
-                            text: "Retirer"
-                            font.pixelSize: 25
-                            font.bold: true
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }                                      
-                }
-
                 
 
                 Popup {
@@ -467,43 +337,19 @@ Window {
 
 
         function onEncoderButtonClicked() {
-            console.log("wheel click")
-            var currentIndex = listView.currentIndex
-
-            if(!itemDetail.visible){
-                if (currentIndex >= 0) {
-                    var selectedItem = myList.get(currentIndex)
-                    itemDetail.index = currentIndex
-                    itemDetail.name = selectedItem.name
-                    itemDetail.dateAdded = selectedItem.dateAdded
-                    itemDetail.dateRemaining = selectedItem.dateRemaining
-                    itemDetail.visible = true
-                }
-            } else {
-                infoPopup.visible = true
-            }
+            var currentIndex = listView.currentIndex            
+            infoPopup.visible = true
         }
 
         function onReturnBtn() {
-            console.log("return")
-            if(itemDetail.visible){
-                if(infoPopup.visible){
-                    infoPopup.visible = false
-                    return
-                }
-                itemDetail.visible = false
-            }
-
-            tipsPopup.visible = false
+            infoPopup.visible = false
         }
 
         function onMoveSelectionUp() {
-            console.log("up")
             listView.moveSelectionUp()
         }
 
         function onMoveSelectionDown() {
-            console.log("down")
             listView.moveSelectionDown()
         }
 
@@ -552,13 +398,20 @@ Window {
         }
 
         function onDisplayTips(id){
-            console.log("tips")
             console.log(id, typeof(id))
             if(id !== 9999){
                 tipsPopup.visible = true
                 tipsPopup.id = id
                 tipsPopup.text = window.tips[id]
             }
+        }
+
+        function onDisplayLoadingScreen(state){
+            window.isCircleVisible = state
+        }
+
+        function onDisplayValidSyncScreen(){
+            syncScreen.visible = true
         }
 
     }

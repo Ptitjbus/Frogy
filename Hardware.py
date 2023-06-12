@@ -1,17 +1,18 @@
 import RPi.GPIO as GPIO
+import time
 
 # Set Pins
-RETURN_BTN = 14
 CLK_PIN = 17
 DT_PIN = 27
 SW_PIN = 22
 TIPS_BTN = 10
+RETURN_BTN = 5
 
 # Init GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(RETURN_BTN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-GPIO.setup(TIPS_BTN, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(TIPS_BTN, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
 GPIO.setup(CLK_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(DT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -25,6 +26,7 @@ class Hardware:
         self.initGPIO()
 
     def initGPIO(self, parent=None):
+
         GPIO.add_event_detect(
             RETURN_BTN, GPIO.BOTH, callback=self.returnCallback, bouncetime=300
         )
@@ -35,8 +37,9 @@ class Hardware:
             CLK_PIN, GPIO.BOTH, callback=self.rotationCallback, bouncetime=2
         )
         GPIO.add_event_detect(
-            TIPS_BTN, GPIO.BOTH, callback=self.tipsBtnCallback, bouncetime=2
+            TIPS_BTN, GPIO.BOTH, callback=self.tipsBtnCallback, bouncetime=300
         )
+
 
     def returnCallback(self, channel):
         buttonState = not GPIO.input(channel)
@@ -44,7 +47,7 @@ class Hardware:
             self.callbackDelegate({'input':'button','state':'pressed','type':'return'})
 
     def swCallback(self, channel):
-            self.callbackDelegate({'input':'wheel','state':'pressed','type':'click'})
+        self.callbackDelegate({'input':'wheel','state':'pressed','type':'click'})
 
     def rotationCallback(self, channel):
         global clkLastState

@@ -51,13 +51,14 @@ class Frogy:
             for elem in gptresponse["list"]:
                 self.backend.addItem(elem)
             self.backend.sortListByDate()
+            self.backend.changeDisplayLoadingScreen(False)
         else:
             printDanger("Erreur lors de la lecture des réponses de GPT")
 
         # send tips tts request
         if( not self.testMode and gptresponse["tips"]):
             self.speaker.generateTips(gptresponse["tips"])
-            self.backend.addTipsFunction(gptresponse["tips"])
+            self.backend.addTipsFunction(gptresponse["tips"])            
         else:     
             printDanger("Erreur lors de la lecture des tips")
 
