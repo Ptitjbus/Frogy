@@ -13,6 +13,14 @@ Window {
     property var tips: []
     property var isSynchronisationLoadingVisible : false
     property var isSynchronisationSuccessVisible : false
+    property var isSynchronisationFailedVisible : false
+
+    property var isFooterSortVisible : true
+    property var isFooterTipsVisible : true
+    property var isFooterSelectVisible : true
+    property var isFooterReturnVisible : true
+    property var isFooterVisible : true
+    
 
     RowLayout {
         anchors.fill: parent
@@ -32,7 +40,7 @@ Window {
                 Image {
                     id: frogyFace
                     anchors.centerIn: parent
-                    source: "frogy_Idle.png"
+                    source: "../frogy_Idle.png"
                     fillMode: Image.PreserveAspectFit
                 }
             }
@@ -43,6 +51,7 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.preferredWidth: 3 * window.width / 5
+            anchors.verticalCenterOffset: -50
 
             ListModel {
                 id: myList
@@ -216,7 +225,7 @@ Window {
                         Image {
                             id: image
                             anchors.centerIn: parent
-                            source: "frogy_Idle.png"
+                            source: "../frogy_Idle.png"
                         }
                     }
 
@@ -244,6 +253,16 @@ Window {
 
     SynchronisationLoading{isVisible:isSynchronisationLoadingVisible}
     SynchronisationSuccess{isVisible:isSynchronisationSuccessVisible}
+    SynchronisationFailed{isVisible:isSynchronisationFailedVisible}
+
+    Footer {
+        isVisible: isFooterVisible;
+        isSortVisible: isFooterSortVisible;
+        isTipsVisible: isFooterTipsVisible;
+        isSelectVisible: isFooterSelectVisible;
+        isReturnVisible: isFooterReturnVisible
+    }
+
 
     Connections {
         target: backend
@@ -260,19 +279,19 @@ Window {
         function onChangeFrogyEmote(emote) {
             switch(emote) {
                 case "idle":
-                    frogyFace.source = "frogy_Idle.png"
+                    frogyFace.source = "../frogy_Idle.png"
                     break;
                 case "sad":
-                    frogyFace.source = "frogy_Sad.png"
+                    frogyFace.source = "../frogy_Sad.png"
                     break;
                 case "thinking":
-                    frogyFace.source = "frogy_Thinking.png"
+                    frogyFace.source = "../frogy_Thinking.png"
                     break;
                 case "calling":
-                    frogyFace.source = "frogy_Calling.png"
+                    frogyFace.source = "../frogy_Calling.png"
                     break;
                 case "loading":
-                    frogyFace.source = "frogy_Loading.png"
+                    frogyFace.source = "../frogy_Loading.png"
                     break;
                 default:
                     console.error("Émotion non reconnue: " + emote);
@@ -282,13 +301,24 @@ Window {
 
 
         function onEncoderButtonClicked() {
-            var currentIndex = listView.currentIndex            
-            infoPopup.visible = true
+            var currentIndex = listView.currentIndex
+            if(myList.count > 0){
+                infoPopup.visible = true
+                window.isFooterVisible = true
+                window.isFooterSortVisible = false
+                window.isFooterTipsVisible = false
+                window.isFooterSelectVisible = true
+                window.isFooterReturnVisible = true
+            }            
         }
 
         function onReturnBtn() {
             if(window.isSynchronisationSuccessVisible){
                 window.isSynchronisationSuccessVisible = false
+            }
+
+            if(window.isSynchronisationFailedVisible){
+                window.isSynchronisationFailedVisible = false
             }
 
             if(tipsPopup.visible){
@@ -298,6 +328,12 @@ Window {
             if(infoPopup.visible){
                 infoPopup.visible = false
             }
+
+            window.isFooterVisible = true
+            window.isFooterSortVisible = true
+            window.isFooterTipsVisible = true
+            window.isFooterSelectVisible = true
+            window.isFooterReturnVisible = false
         }
 
         function onMoveSelectionUp() {
@@ -353,7 +389,12 @@ Window {
         }
 
         function onDisplayTips(id){
-            console.log(id, typeof(id))
+            window.isFooterVisible = true
+            window.isFooterSortVisible = false
+            window.isFooterTipsVisible = true
+            window.isFooterSelectVisible = false
+            window.isFooterReturnVisible = true
+
             if(id !== 9999){
                 tipsPopup.visible = true
                 tipsPopup.id = id
@@ -363,12 +404,20 @@ Window {
 
         function onDisplayLoadingSyncScreen(){
             window.isSynchronisationLoadingVisible = true
+            window.isFooterVisible = false
         }
 
         function onDisplayResultSyncScreen(state){
             window.isSynchronisationLoadingVisible = false
             if(state){
                 window.isSynchronisationSuccessVisible = true
+                window.isFooterVisible = false
+            }else{
+                window.isSynchronisationFailedVisible = true
+                window.isFooterSortVisible = false
+                window.isFooterTipsVisible = false
+                window.isFooterSelectVisible = false
+                window.isFooterReturnVisible = true
             }
         }
 

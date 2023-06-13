@@ -23,7 +23,7 @@ def main():
 
 
     # init the display
-    qml_file = Path(__file__).resolve().parent / "main.qml"
+    qml_file = Path(__file__).resolve().parent / "./views/main.qml"
     engine.load(str(qml_file))
     if not engine.rootObjects():
         sys.exit(-1)

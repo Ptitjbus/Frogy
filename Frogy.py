@@ -8,7 +8,7 @@ from Backend import *
 
 class Frogy:
     def __init__(self, engine) -> None:
-        self.testMode = False #mock
+        self.testMode = True #mock
         self.engine = engine
         self.backend = Backend(self.engine)
         self.gpt = ChatGPT(self.backend)

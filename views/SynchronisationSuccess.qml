@@ -75,16 +75,11 @@ Item {
             border.color: "#2E524518"
         }
 
-        Text {
-            text: "Synchronisation en cours"
+        Image {
+            source: "../assets/icons/check.svg"
+            width: 112
+            height: 84
             anchors.centerIn: parent
-            width: circleSuccess.width-100
-            wrapMode: Text.Wrap
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            color: "white"
-            font.pixelSize: 30
-            font.bold: true
         }
 
         Text {
