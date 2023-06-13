@@ -6,9 +6,10 @@ import re
 
 class Speaker:
 
-    def __init__(self) -> None:
+    def __init__(self,backend) -> None:
         self.tipsFiles = []
         self.ready = False
+        self.backend = backend
         pygame.mixer.init()
 
     def generateTips(self, tipsList):
@@ -21,6 +22,7 @@ class Speaker:
             counter += 1
 
         printSuccess("Génération des tips terminé")
+        self.backend.changeFrogyFace("tips")
         self.ready = True
 
     def getTips(self):

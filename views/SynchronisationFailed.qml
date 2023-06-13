@@ -17,6 +17,15 @@ Item {
         visible: false
         z:2
 
+        Image {
+            id: frogyFaceFailed
+            width: 300
+            height: 300
+            anchors.centerIn: parent
+            source: "../assets/emotes/Bug.png"
+            fillMode: Image.PreserveAspectFit
+        }
+
         MediaPlayer {
             id: mediaPlayer
             source: "../assets/emotes/Bug.webm"

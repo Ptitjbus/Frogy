@@ -34,7 +34,7 @@ class FrogyThread(threading.Thread):
                     updatedList.append(updatedItem)
                     if(daysRemaining <= 0):
                         print(daysRemaining, item['name'])
-                        self.emote = "calling"
+                        self.emote = "exclamation"
                 
                 if(len(updatedList) > 0):
                     self.backend.updateListFunction(updatedList) #met à jours la liste dans froggy 

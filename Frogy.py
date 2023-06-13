@@ -13,7 +13,7 @@ class Frogy:
         self.backend = Backend(self.engine)
         self.gpt = ChatGPT(self.backend)
         self.frogyThread = FrogyThread(self.backend)
-        self.speaker = Speaker()
+        self.speaker = Speaker(self.backend)
         self.currentTipsId = 0
         engine.rootContext().setContextProperty("backend", self.backend)
 
@@ -57,7 +57,7 @@ class Frogy:
             printDanger("Erreur lors de la lecture des réponses de GPT")
 
         # send tips tts request
-        if( not self.testMode and gptresponse["tips"]):
+        if(gptresponse["tips"]):
             self.speaker.generateTips(gptresponse["tips"])
             self.backend.addTipsFunction(gptresponse["tips"])            
         else:     

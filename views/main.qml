@@ -3,6 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
 import QtGraphicalEffects 1.15
+import QtMultimedia 5.12
 
 Window {
     id: window
@@ -14,7 +15,7 @@ Window {
     property var tips: []
     property var isSynchronisationLoadingVisible : false
     property var isSynchronisationSuccessVisible : false
-    property var isSynchronisationFailedVisible : false
+    property var isSynchronisationFailedVisible : true
 
     property var isFooterSortVisible : true
     property var isFooterTipsVisible : true
@@ -34,16 +35,37 @@ Window {
             
 
             Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                
+                width: parent.width
+                height: parent.height
+                // Layout.fillWidth: true
+                // Layout.fillHeight: true
 
                 Image {
                     id: frogyFace
+                    width: 300
+                    height: 300
                     anchors.centerIn: parent
-                    source: "../frogy_Idle.png"
+                    source: "../assets/emotes/Idle.png"
                     fillMode: Image.PreserveAspectFit
                 }
+
+                MediaPlayer {
+                    id: frogyFaceMediaPlayer
+                    source: "../assets/emotes/Idle.webm"
+                    autoPlay: true
+                    loops: MediaPlayer.Infinite
+                }
+
+                VideoOutput {
+                    id: videoOutput
+                    source: frogyFaceMediaPlayer
+                    width: 300
+                    height: 300
+                    anchors.centerIn: parent
+                    fillMode: VideoOutput.PreserveAspectFit
+                    z: 1 // Assurez-vous que la vidéo est en dessous du texte
+                }
+
             }
         }
 
@@ -349,19 +371,24 @@ Window {
         function onChangeFrogyEmote(emote) {
             switch(emote) {
                 case "idle":
-                    frogyFace.source = "../frogy_Idle.png"
+                    frogyFace.source = "../assets/emotes/Idle.png"
+                    frogyFaceMediaPlayer.source = "../assets/emotes/Idle.webm"
                     break;
-                case "sad":
-                    frogyFace.source = "../frogy_Sad.png"
+                case "bug":
+                    frogyFace.source = "../assets/emotes/bug.png"
+                    frogyFaceMediaPlayer.source = "../assets/emotes/bug.webm"
                     break;
-                case "thinking":
-                    frogyFace.source = "../frogy_Thinking.png"
+                case "tips":
+                    frogyFace.source = "../assets/emotes/Tips.png"
+                    frogyFaceMediaPlayer.source = "../assets/emotes/Tips.webm"
                     break;
-                case "calling":
-                    frogyFace.source = "../frogy_Calling.png"
+                case "exclamation":
+                    frogyFace.source = "../assets/emotes/Exclamation.png"
+                    frogyFaceMediaPlayer.source = "../assets/emotes/Exclamation.webm"
                     break;
-                case "loading":
-                    frogyFace.source = "../frogy_Loading.png"
+                case "sleep":
+                    frogyFace.source = "../assets/emotes/Sleep.png"
+                    frogyFaceMediaPlayer.source = "../assets/emotes/Sleep.webm"
                     break;
                 default:
                     console.error("Émotion non reconnue: " + emote);
@@ -374,6 +401,10 @@ Window {
             var currentIndex = listView.currentIndex
             var item = myList.get(currentIndex)
             infoPopup.name = item.name
+
+            if(window.isSynchronisationSuccessVisible || window.isSynchronisationFailedVisible || window.isSynchronisationLoadingVisible){
+                return
+            }
 
             if(infoPopup.visible){
                 if (infoPopup.currentIndex === 1) {
