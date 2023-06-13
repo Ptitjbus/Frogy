@@ -2,13 +2,14 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
+import QtGraphicalEffects 1.15
 
 Window {
     id: window
     width: 640
     height: 380
     title: qsTr("Frogy")
-    visible: true    
+    visible: true
 
     property var tips: []
     property var isSynchronisationLoadingVisible : false
@@ -18,7 +19,7 @@ Window {
     property var isFooterSortVisible : true
     property var isFooterTipsVisible : true
     property var isFooterSelectVisible : true
-    property var isFooterReturnVisible : true
+    property var isFooterReturnVisible : false
     property var isFooterVisible : true
     
 
@@ -172,30 +173,97 @@ Window {
                         width: 15
                     }
                 }
-                
+            }
+        }
 
-                Popup {
-                    id: infoPopup
-                    width: 300
-                    height: 150
-                    x: (listView.width - width) / 2
-                    y: (listView.height - height) / 2
-                    visible: false
+        Popup {
+            id: infoPopup
+            width: 500
+            height: popUpLabel.height + noChoice.height + yesChoice.height + 120
+            x: (parent.width - width) / 2
+            y: (parent.height - height) / 2
 
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: 10
+            property string name
+            property int currentIndex: 0 
 
-                        Text {
-                            id: itemName
-                            font.bold: true
-                            text: "salut"
-                        }
+            background: Rectangle {
+                color: "white"
+                radius: 10
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    color: "#D2D2D2"
+                    radius: 20
+                    samples: 16
+                    spread: 0.2
+                }
+            }
 
-                        Text {
-                            id: itemDateAdded
-                        }
-                    }
+            // Le Texte
+            Label {
+                id: popUpLabel
+                width: infoPopup.width -50
+                text: "Tu es sur le point de retirer l'article "+ infoPopup.name +" de ta liste de produit"
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+                anchors.top: parent.top
+                anchors.topMargin: 20
+                font.pixelSize: 25
+                color: "#2E5245"
+                font.bold: true
+            }
+
+            // Le premier rectangle
+            Rectangle {
+                id: noChoice
+                width: infoPopup.currentIndex == 0 ? 400 : 300
+                height: infoPopup.currentIndex == 0 ? 75 : 50
+                color: "#FBF4E8"
+                anchors.top: popUpLabel.bottom
+                anchors.topMargin: 50
+                anchors.right: popUpLabel.right
+                radius:5
+
+                // Le Texte dans le rectangle
+                Text {
+                    text: "Non"
+                    anchors.centerIn: parent
+                    color: "#2E5245"
+                    font.bold: true
+                    font.pixelSize: 25
+                }
+            }
+
+            // Le deuxième rectangle
+            Rectangle {
+                id: yesChoice
+                width: infoPopup.currentIndex == 1 ? 400 : 300
+                height: infoPopup.currentIndex == 1 ? 75 : 50
+                color: "#ED6A58"
+                anchors.top: noChoice.bottom
+                anchors.topMargin: 10
+                anchors.right: popUpLabel.right
+                radius:5
+
+                // Le Texte dans le rectangle
+                Text {
+                    text: "Oui, retirer"
+                    anchors.centerIn: parent
+                    color: "#FDF3E8"
+                    font.bold: true
+                    font.pixelSize: 25
+                }
+            }
+
+            
+            function moveSelectionUp() {
+                if (currentIndex == 1) {
+                    currentIndex = 0;
+                }
+            }
+
+            function moveSelectionDown() {
+                if (currentIndex == 0) {
+                    currentIndex = 1;
                 }
             }
         }
@@ -232,6 +300,7 @@ Window {
                     Rectangle {
                         width: parent.width
                         height: parent.height / 3
+
                         Text {
                             id: tipsText
                             width: parent.width - 60
@@ -240,10 +309,11 @@ Window {
                             font.bold: true
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
-                            text: "Tips n°"+tipsPopup.id+" : "+tipsPopup.text+""
+                            text: tipsPopup.text
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.verticalCenter: parent.verticalCenter
                         }
+
                     }
                 }
             }
@@ -256,7 +326,7 @@ Window {
     SynchronisationFailed{isVisible:isSynchronisationFailedVisible}
 
     Footer {
-        isVisible: isFooterVisible;
+        visible: isFooterVisible;
         isSortVisible: isFooterSortVisible;
         isTipsVisible: isFooterTipsVisible;
         isSelectVisible: isFooterSelectVisible;
@@ -302,7 +372,17 @@ Window {
 
         function onEncoderButtonClicked() {
             var currentIndex = listView.currentIndex
-            if(myList.count > 0){
+            var item = myList.get(currentIndex)
+            infoPopup.name = item.name
+
+            if(infoPopup.visible){
+                if (infoPopup.currentIndex === 1) {
+                    myList.remove(currentIndex)
+                }
+
+                infoPopup.close()
+                infoPopup.visible = false
+            } else if(myList.count > 0){
                 infoPopup.visible = true
                 window.isFooterVisible = true
                 window.isFooterSortVisible = false
@@ -337,11 +417,19 @@ Window {
         }
 
         function onMoveSelectionUp() {
-            listView.moveSelectionUp()
+            if(infoPopup.visible == false){
+                listView.moveSelectionUp()
+            }else{
+                infoPopup.moveSelectionUp()
+            }
         }
 
         function onMoveSelectionDown() {
-            listView.moveSelectionDown()
+            if(infoPopup.visible == false){
+                listView.moveSelectionDown()
+            }else{
+                infoPopup.moveSelectionDown()
+            }
         }
 
         function onRequestListData() {

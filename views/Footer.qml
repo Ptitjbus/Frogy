@@ -10,13 +10,13 @@ Rectangle {
     color: "white"
     anchors.bottom: parent.bottom
     z:10
-    visible: true
 
     property alias isSortVisible: sortItem.visible
     property alias isTipsVisible: tipsItem.visible
     property alias isSelectVisible: selectItem.visible
     property alias isReturnVisible: returnItem.visible
-    property alias isVisible : footer.visible
+
+    visible : false
 
     layer.enabled: true
     layer.effect: DropShadow {
