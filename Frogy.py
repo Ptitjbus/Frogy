@@ -15,6 +15,7 @@ class Frogy:
         self.frogyThread = FrogyThread(self.backend)
         self.speaker = Speaker(self.backend)
         self.currentTipsId = 0
+        self.currentSorting = "date"
         engine.rootContext().setContextProperty("backend", self.backend)
 
     def start(self):
@@ -50,7 +51,8 @@ class Frogy:
         if(gptresponse["list"]):
             for elem in gptresponse["list"]:
                 self.backend.addItem(elem)
-            self.backend.sortListByDate()
+            self.backend.sortListByDate(False)
+            self.currentSorting = "date"
             self.backend.changeDisplayResultSyncScreen(True)
         else:
             self.backend.changeDisplayResultSyncScreen(False)
@@ -93,3 +95,10 @@ class Frogy:
                     self.currentTipsId = 0
                 else:
                     self.currentTipsId += 1
+            elif(callback['type'] == 'sort'):
+                if(self.currentSorting == "date"):
+                    self.backend.sortListByName()
+                    self.currentSorting = "name"
+                elif(self.currentSorting == "name"):
+                    self.backend.sortListByDate(True)
+                    self.currentSorting = "date"

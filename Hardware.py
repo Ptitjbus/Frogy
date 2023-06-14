@@ -7,12 +7,16 @@ DT_PIN = 27
 SW_PIN = 22
 TIPS_BTN = 10
 RETURN_BTN = 5
+SORT_BTN = 6
+
 
 # Init GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(RETURN_BTN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 GPIO.setup(TIPS_BTN, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+
+GPIO.setup(SORT_BTN, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
 GPIO.setup(CLK_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(DT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -39,6 +43,9 @@ class Hardware:
         GPIO.add_event_detect(
             TIPS_BTN, GPIO.BOTH, callback=self.tipsBtnCallback, bouncetime=300
         )
+        GPIO.add_event_detect(
+            SORT_BTN, GPIO.BOTH, callback=self.sortBtnCallback, bouncetime=300
+        )
 
 
     def returnCallback(self, channel):
@@ -48,6 +55,9 @@ class Hardware:
 
     def swCallback(self, channel):
         self.callbackDelegate({'input':'wheel','state':'pressed','type':'click'})
+    
+    def sortBtnCallback(self, channel):
+        self.callbackDelegate({'input':'button','state':'pressed','type':'sort'})
 
     def rotationCallback(self, channel):
         global clkLastState

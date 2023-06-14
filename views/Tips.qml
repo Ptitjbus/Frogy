@@ -5,39 +5,36 @@ import QtQuick.Layouts 1.2
 import QtMultimedia 5.12
 
 Item {  
-    id: syncScreenItem
+    id: tipsScreen
     width: 1024
     height: 600
-    property alias isVisible : syncScreen.visible
+    property alias tipsText: tipsText.text
 
     Rectangle {
-        id: syncScreen
         color: "white"
         anchors.fill: parent
-        visible: false
-        z:2
 
         Image {
-            id: frogyFaceFailed
+            id: frogyFaceTipsScreen
             width: 300
             height: 300
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -100
-            source: "../assets/emotes/Bug.png"
+            source: "../assets/emotes/Idle.png"
             fillMode: Image.PreserveAspectFit
         }
 
         MediaPlayer {
-            id: mediaPlayer
-            source: "../assets/emotes/Bug.webm"
+            id: mediaPlayerTipsScreen
+            source: "../assets/emotes/Idle.webm"
             autoPlay: true
             loops: MediaPlayer.Infinite
         }
 
         VideoOutput {
-            id: videoOutput
-            source: mediaPlayer
+            id: videoOutputTipsScreen
+            source: mediaPlayerTipsScreen
             width: 300
             height: 300
             anchors.horizontalCenter: parent.horizontalCenter
@@ -48,21 +45,18 @@ Item {
         }
 
         Text {
-            id: waitingText
-            text: "Oups, quelque chose cloche..."
+            id: tipsText
             font.bold:true
             color: "#2E5245"
             width: parent.width
             horizontalAlignment: Text.AlignHCenter
             anchors {
-                top: videoOutput.bottom
+                top: videoOutputTipsScreen.bottom
                 topMargin: 50
                 horizontalCenter: parent.horizontalCenter
             }
             font.pixelSize: 30
             z: 2
-        }
+        }        
     }
-
-    Footer{isReturnVisible:true}
 }

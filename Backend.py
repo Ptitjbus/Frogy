@@ -10,7 +10,8 @@ class Backend(QObject):
     encoderButtonClicked = Signal()
     changeFrogyEmote = Signal(str)
     requestListData = Signal()
-    sortByDate = Signal()
+    sortByDate = Signal(bool)
+    sortByName = Signal()
     updateListItems = Signal(str)
     addTips = Signal(list)
     displayTips = Signal(int)
@@ -50,8 +51,11 @@ class Backend(QObject):
     def receiveListData(self, data):
         self.frogyData = data
 
-    def sortListByDate(self):
-        self.sortByDate.emit()
+    def sortListByDate(self, state):
+        self.sortByDate.emit(state)
+    
+    def sortListByName(self):
+        self.sortByName.emit()
 
     def updateListFunction(self, newList):
         self.updateListItems.emit(json.dumps(newList))

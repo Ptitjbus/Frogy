@@ -13,9 +13,12 @@ Window {
     visible: true
 
     property var tips: []
+    property var tipsScreenVisible: false
+    property var tipsTextScreen: ""
+
     property var isSynchronisationLoadingVisible : false
     property var isSynchronisationSuccessVisible : false
-    property var isSynchronisationFailedVisible : true
+    property var isSynchronisationFailedVisible : false
 
     property var isFooterSortVisible : true
     property var isFooterTipsVisible : true
@@ -81,7 +84,8 @@ Window {
             }
 
             Item {
-                anchors.fill: parent
+                Layout.fillHeight: true
+                Layout.fillWidth: true
 
                 ListView {
                     id: listView
@@ -101,9 +105,7 @@ Window {
                             anchors.leftMargin: 5
                             anchors.topMargin: 5
                             anchors.bottomMargin: 5
-                            color: "#E2E8F0"
-                            border.width: 2
-                            border.color: listView.currentIndex === index ? "#485877" : "transparent"                            
+                            color: listView.currentIndex === index ? "#2E5245" : "#FDF3E8"                            
                             radius: 5
 
                             RowLayout {
@@ -124,6 +126,7 @@ Window {
                                         font.pixelSize: 35
                                         font.bold: true
                                         elide: Text.ElideRight
+                                        color: listView.currentIndex === index ? "#FDF3E8" : "#2E5245" 
                                     }
                                 }
 
@@ -133,16 +136,7 @@ Window {
                                     Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                                     width: textLabel.width + 20
                                     Layout.preferredHeight: itemDelegate.height / 3
-                                    color: {
-                                        if (model.dateRemaining < 0)
-                                            return "#F87171";
-                                        else if (model.dateRemaining === 0)
-                                            return "#FDBA74";
-                                        else if (model.dateRemaining >= 1 && model.dateRemaining <= 3)
-                                            return "#FFE76B";
-                                        else 
-                                            return "#CBD5E1";
-                                    }
+                                    color: connectionBackend.checkDateLabelColor(model.dateRemaining)
 
                                     Text {
                                         id: textLabel
@@ -150,26 +144,9 @@ Window {
                                         font.bold: true
                                         anchors.centerIn: parent
 
-                                        color: "#2E5245"
+                                        color: model.dateRemaining < 0 ? "#FDF3E8"  : "#2E5245"
 
-                                        text: {
-                                            if (model.dateRemaining < 0)
-                                                return "A vérifier";
-                                            else if (model.dateRemaining === 0)
-                                                return "Moins de 24h";
-                                            else if (model.dateRemaining >= 1 && model.dateRemaining <= 3)
-                                                return "1 à 3 jours";
-                                            else if (model.dateRemaining >= 4 && model.dateRemaining <= 7)
-                                                return "4 à 7 jours";
-                                            else if (model.dateRemaining >= 8 && model.dateRemaining <= 14)
-                                                return "1 à 2 semaines";
-                                            else if (model.dateRemaining >= 15 && model.dateRemaining <= 28)
-                                                return "2 à 4 semaines";
-                                            else if (model.dateRemaining >= 29 && model.dateRemaining <= 90)
-                                                return "1 à 3 mois";
-                                            else if (model.dateRemaining > 90)
-                                                return "> 3 mois";
-                                        }
+                                        text: connectionBackend.checkDateLabelText(model.dateRemaining) 
                                     }
                                 }
 
@@ -197,6 +174,170 @@ Window {
                 }
             }
         }
+
+        Popup {
+            id: sortByNamePopup
+            width: 400
+            height: 300
+            x: (parent.width - width) / 2
+            y: (parent.height - height) / 2
+            visible: false
+            opacity: 0.0 // Initialiser l'opacité à 0
+
+            Timer {
+                id: visibilityNameTimer
+                interval: 2000
+                running: false
+                onTriggered: sortByNamePopup.fadeOut()
+            }
+
+            function fadeIn() {
+                visibilityNameTimer.restart()
+                sortByNamePopup.visible = true
+                sortByNamePopup.opacity = 1
+            }
+
+            function fadeOut() {
+                sortByNamePopup.opacity = 0
+            }
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 500 // durée de l'animation en millisecondes
+                    easing.type: Easing.InOutQuad // type d'animation
+                }
+            }
+
+            onVisibleChanged: {
+                if (visible) {
+                    fadeIn()
+                } else {
+                    visibilityNameTimer.stop()
+                }
+            }
+
+            background: Rectangle {
+                color: "white"
+                radius: 10
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    color: "#D2D2D2"
+                    radius: 20
+                    samples: 16
+                    spread: 0.2
+                }
+            }
+
+
+            Image {
+                id: alphabeticIcon
+                width: 100
+                height: 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: -40
+                source: "../assets/icons/sortAlphabetic.svg"
+                fillMode: Image.PreserveAspectFit
+            }            
+
+            Text{
+                font.bold:true
+                color: "#2E5245"
+                text: "Ordre alphabétique"
+                width: parent.width -20
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 30
+                anchors {
+                    top: alphabeticIcon.bottom
+                    topMargin: 50
+                    horizontalCenter: parent.horizontalCenter
+                }
+            }
+            
+        }
+
+        Popup {
+            id: sortByDatePopup
+            width: 400
+            height: 300
+            x: (parent.width - width) / 2
+            y: (parent.height - height) / 2
+            visible: false
+            opacity: 0.0 // Initialiser l'opacité à 0
+
+            Timer {
+                id: visibilityDateTimer
+                interval: 2000
+                running: false
+                onTriggered: sortByDatePopup.fadeOut()
+            }
+
+            function fadeIn() {
+                visibilityDateTimer.restart()
+                sortByDatePopup.visible = true
+                sortByDatePopup.opacity = 1
+            }
+
+            function fadeOut() {
+                sortByDatePopup.opacity = 0
+            }
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 500 // durée de l'animation en millisecondes
+                    easing.type: Easing.InOutQuad // type d'animation
+                }
+            }
+
+            onVisibleChanged: {
+                if (visible) {
+                    fadeIn()
+                } else {
+                    visibilityDateTimer.stop()
+                }
+            }
+
+            background: Rectangle {
+                color: "white"
+                radius: 10
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    color: "#D2D2D2"
+                    radius: 20
+                    samples: 16
+                    spread: 0.2
+                }
+            }
+
+
+            Image {
+                id: dateIcon
+                width: 100
+                height: 100
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: -40
+                source: "../assets/icons/sortDate.svg"
+                fillMode: Image.PreserveAspectFit
+            }            
+
+            Text{
+                font.bold:true
+                color: "#2E5245"
+                text: "Ordre de consommation"
+                width: parent.width -20
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 30
+                anchors {
+                    top: dateIcon.bottom
+                    topMargin: 50
+                    horizontalCenter: parent.horizontalCenter
+                }
+            }
+            
+        }
+
+
 
         Popup {
             id: infoPopup
@@ -290,59 +431,10 @@ Window {
             }
         }
 
-        Popup {
-            id: tipsPopup
-            visible: false
-            modal: true
-            width: parent.width
-            height: parent.height
-
-            property string id
-            property string text
-
-            Rectangle {
-                width: parent.width
-                height: parent.height
-                color: "white"
-
-                Column {
-                    anchors.fill: parent
-                    spacing: 0
-
-                    Rectangle {
-                        width: parent.width
-                        height: 2 * parent.height / 3
-                        Image {
-                            id: image
-                            anchors.centerIn: parent
-                            source: "../frogy_Idle.png"
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: parent.height / 3
-
-                        Text {
-                            id: tipsText
-                            width: parent.width - 60
-                            wrapMode: Text.Wrap
-                            font.pixelSize: 25
-                            font.bold: true
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            text: tipsPopup.text
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                    }
-                }
-            }
-        }
 
     }
 
+    Tips{visible: tipsScreenVisible; tipsText: tipsTextScreen}
     SynchronisationLoading{isVisible:isSynchronisationLoadingVisible}
     SynchronisationSuccess{isVisible:isSynchronisationSuccessVisible}
     SynchronisationFailed{isVisible:isSynchronisationFailedVisible}
@@ -357,6 +449,7 @@ Window {
 
 
     Connections {
+        id: connectionBackend
         target: backend
         function onAddListItem(jsonItem) {
             var item = JSON.parse(jsonItem);
@@ -402,7 +495,7 @@ Window {
             var item = myList.get(currentIndex)
             infoPopup.name = item.name
 
-            if(window.isSynchronisationSuccessVisible || window.isSynchronisationFailedVisible || window.isSynchronisationLoadingVisible){
+            if(window.isSynchronisationSuccessVisible || window.isSynchronisationFailedVisible || window.isSynchronisationLoadingVisible || window.tipsScreenVisible){
                 return
             }
 
@@ -432,12 +525,12 @@ Window {
                 window.isSynchronisationFailedVisible = false
             }
 
-            if(tipsPopup.visible){
-                tipsPopup.visible = false
-            }
-
             if(infoPopup.visible){
                 infoPopup.visible = false
+            }
+
+            if(window.tipsScreenVisible){
+                window.tipsScreenVisible = false
             }
 
             window.isFooterVisible = true
@@ -473,7 +566,10 @@ Window {
             backend.receiveListData(listData)
         }
 
-        function onSortByDate() {
+        function onSortByDate(state) {
+            if(state){
+                sortByDatePopup.fadeIn()
+            }
             var array = []
             for (var i = 0; i < myList.count; i++) {
                 let item = myList.get(i)
@@ -491,6 +587,33 @@ Window {
             }
         }
 
+        function onSortByName() {
+            sortByNamePopup.fadeIn()
+
+            var array = []
+            for (var i = 0; i < myList.count; i++) {
+                let item = myList.get(i)
+                array.push({name: item.name, dateAdded: item.dateAdded, dateRemaining: item.dateRemaining})
+            }
+
+            array.sort(function(a, b) {
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0; //les noms sont égaux
+            })
+
+            myList.clear()
+
+            for (var i = 0; i < array.length; i++) {
+                myList.append(array[i])
+            }
+        }
+
+
         function onUpdateListItems(newList){
             var newListParsed = JSON.parse(newList);
 
@@ -503,22 +626,22 @@ Window {
 
     
         function onAddTips(tipsList){
-            console.log(tipsList[0], typeof(tipsList))
             window.tips = tipsList
         }
 
         function onDisplayTips(id){
-            window.isFooterVisible = true
-            window.isFooterSortVisible = false
-            window.isFooterTipsVisible = true
-            window.isFooterSelectVisible = false
-            window.isFooterReturnVisible = true
 
             if(id !== 9999){
-                tipsPopup.visible = true
-                tipsPopup.id = id
-                tipsPopup.text = window.tips[id]
+                window.tipsScreenVisible = true
+                window.tipsTextScreen = window.tips[id]
+
+                window.isFooterVisible = true
+                window.isFooterSortVisible = false
+                window.isFooterTipsVisible = true
+                window.isFooterSelectVisible = false
+                window.isFooterReturnVisible = true
             }
+
         }
 
         function onDisplayLoadingSyncScreen(){
@@ -538,6 +661,36 @@ Window {
                 window.isFooterSelectVisible = false
                 window.isFooterReturnVisible = true
             }
+        }
+
+        function checkDateLabelColor(dateRemaining){
+             if (dateRemaining < 0)
+                return "#F87171";
+            else if (dateRemaining === 0)
+                return "#FDBA74";
+            else if (dateRemaining >= 1 && dateRemaining <= 3)
+                return "#FFE76B";
+            else 
+                return "#CBD5E1";
+        }
+
+        function checkDateLabelText(dateRemaining){
+            if (dateRemaining < 0)
+                return "A vérifier";
+            else if (dateRemaining === 0)
+                return "Moins de 24h";
+            else if (dateRemaining >= 1 && dateRemaining <= 3)
+                return "1 à 3 jours";
+            else if (dateRemaining >= 4 && dateRemaining <= 7)
+                return "4 à 7 jours";
+            else if (dateRemaining >= 8 && dateRemaining <= 14)
+                return "1 à 2 semaines";
+            else if (dateRemaining >= 15 && dateRemaining <= 28)
+                return "2 à 4 semaines";
+            else if (dateRemaining >= 29 && dateRemaining <= 90)
+                return "1 à 3 mois";
+            else if (dateRemaining > 90)
+                return "> 3 mois";
         }
 
     }
