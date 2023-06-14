@@ -48,7 +48,8 @@ Item {
             id: tipsText
             font.bold:true
             color: "#2E5245"
-            width: parent.width
+            width: parent.width - 100
+            wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             anchors {
                 top: videoOutputTipsScreen.bottom
