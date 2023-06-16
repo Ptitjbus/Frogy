@@ -8,7 +8,7 @@ from Backend import *
 
 class Frogy:
     def __init__(self, engine) -> None:
-        self.testMode = True #mock
+        self.testMode = False #mock
         self.engine = engine
         self.backend = Backend(self.engine)
         self.gpt = ChatGPT(self.backend)
@@ -86,10 +86,10 @@ class Frogy:
                 
                 if(self.speaker.ready):
                     self.backend.displayTips.emit(self.currentTipsId)
+                    self.speaker.say(self.currentTipsId)
                 else:
                     self.backend.displayTips.emit(9999)
 
-                self.speaker.say(self.currentTipsId)
                     
                 if(self.currentTipsId == len(self.speaker.tipsFiles) - 1):
                     self.currentTipsId = 0

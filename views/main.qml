@@ -25,7 +25,6 @@ Window {
     property var isFooterSelectVisible : true
     property var isFooterReturnVisible : false
     property var isFooterVisible : true
-    
 
     RowLayout {
         anchors.fill: parent
