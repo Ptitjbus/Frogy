@@ -77,7 +77,7 @@ class ChatGPT:
     def convertList(self, date, itemsList):
         itemlist = self.updateListPrompt(itemsList)
         prompt = (
-            'En fonction de la liste de courses et de la date que je te donne, réponds moi uniquement un json entouré de ``` sous la forme suivante :{"list": [{"name":"nom du produit","date":"estimation du nombre de jours avant sa péremption, juste le nombre de jours"}],"tips": liste de 5 conseils pour mieux consommer les produits}. Voici la date : '
+            'En fonction de la liste de courses et de la date que je te donne, réponds moi uniquement un json entouré de ``` sous la forme suivante :{"list": [{"name":"nom du produit","date":"estimation du nombre de jours avant sa péremption, juste le nombre de jours"}],"tips": liste de 5 conseils pour mieux consommer/conserver les produits}. Voici la date : '
             + date
             + " et voici la liste :  "
             + itemlist

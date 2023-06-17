@@ -24,7 +24,9 @@ Window {
     property var isFooterTipsVisible : true
     property var isFooterSelectVisible : true
     property var isFooterReturnVisible : false
-    property var isFooterVisible : true
+    property var isFooterVisible : false
+
+    property var isSleepScreenVisible: true
 
     RowLayout {
         anchors.fill: parent
@@ -361,17 +363,17 @@ Window {
             }
 
             // Le Texte
-            Label {
+            Text {
                 id: popUpLabel
                 width: infoPopup.width -50
-                text: "Tu es sur le point de retirer l'article "+ infoPopup.name +" de ta liste de produit"
+                text: "Tu es sur le point de retirer l'article <b>"+ infoPopup.name +"</b> de ta liste de produit"
                 wrapMode: Text.Wrap
                 horizontalAlignment: Text.AlignHCenter
                 anchors.top: parent.top
                 anchors.topMargin: 20
                 font.pixelSize: 25
                 color: "#2E5245"
-                font.bold: true
+                textFormat: Text.RichText
             }
 
             // Le premier rectangle
@@ -437,6 +439,7 @@ Window {
     SynchronisationLoading{isVisible:isSynchronisationLoadingVisible}
     SynchronisationSuccess{isVisible:isSynchronisationSuccessVisible}
     SynchronisationFailed{isVisible:isSynchronisationFailedVisible}
+    SleepScreen{isVisible:isSleepScreenVisible}
 
     Footer {
         visible: isFooterVisible;
@@ -450,6 +453,7 @@ Window {
     Connections {
         id: connectionBackend
         target: backend
+
         function onAddListItem(jsonItem) {
             var item = JSON.parse(jsonItem);
             var isListWasEmpty = listView.count === 0
@@ -457,6 +461,16 @@ Window {
 
             if(isListWasEmpty){
                 listView.currentIndex = 0;
+            }
+        }
+
+        function onDisplaySleepScreen(state){
+            if(state){
+                window.isSleepScreenVisible = true
+                window.isFooterVisible = false
+            } else {
+                window.isSleepScreenVisible = false
+                window.isFooterVisible = window.isSynchronisationSuccessVisible
             }
         }
 
@@ -490,29 +504,36 @@ Window {
 
 
         function onEncoderButtonClicked() {
-            var currentIndex = listView.currentIndex
-            var item = myList.get(currentIndex)
-            infoPopup.name = item.name
+            if(myList.count > 0){
+                var currentIndex = listView.currentIndex
+                var item = myList.get(currentIndex)
+                infoPopup.name = item.name
 
-            if(window.isSynchronisationSuccessVisible || window.isSynchronisationFailedVisible || window.isSynchronisationLoadingVisible || window.tipsScreenVisible){
-                return
-            }
-
-            if(infoPopup.visible){
-                if (infoPopup.currentIndex === 1) {
-                    myList.remove(currentIndex)
+                if(window.isSynchronisationSuccessVisible || window.isSynchronisationFailedVisible || window.isSynchronisationLoadingVisible || window.tipsScreenVisible){
+                    return
                 }
 
-                infoPopup.close()
-                infoPopup.visible = false
-            } else if(myList.count > 0){
-                infoPopup.visible = true
-                window.isFooterVisible = true
-                window.isFooterSortVisible = false
-                window.isFooterTipsVisible = false
-                window.isFooterSelectVisible = true
-                window.isFooterReturnVisible = true
-            }            
+                if(infoPopup.visible){
+                    if (infoPopup.currentIndex === 1) {
+                        myList.remove(currentIndex)
+                    }
+
+                    infoPopup.close()
+                    
+                    window.isFooterVisible = true
+                    window.isFooterSortVisible = true
+                    window.isFooterTipsVisible = true
+                    window.isFooterSelectVisible = true
+                    window.isFooterReturnVisible = false
+                } else {
+                    infoPopup.visible = true
+                    window.isFooterVisible = true
+                    window.isFooterSortVisible = false
+                    window.isFooterTipsVisible = false
+                    window.isFooterSelectVisible = true
+                    window.isFooterReturnVisible = true
+                }    
+            }        
         }
 
         function onReturnBtn() {
@@ -566,49 +587,53 @@ Window {
         }
 
         function onSortByDate(state) {
-            if(state){
-                sortByDatePopup.fadeIn()
-            }
-            var array = []
-            for (var i = 0; i < myList.count; i++) {
-                let item = myList.get(i)
-                array.push({name: item.name, dateAdded: item.dateAdded, dateRemaining: item.dateRemaining})
-            }
+            if(!tipsScreenVisible && !isSynchronisationLoadingVisible && !isSynchronisationSuccessVisible && !isSynchronisationFailedVisible){
+                if(state){
+                    sortByDatePopup.fadeIn()
+                }
+                var array = []
+                for (var i = 0; i < myList.count; i++) {
+                    let item = myList.get(i)
+                    array.push({name: item.name, dateAdded: item.dateAdded, dateRemaining: item.dateRemaining})
+                }
 
-            array.sort(function(a, b) {
-                return a.dateRemaining - b.dateRemaining;
-            })
+                array.sort(function(a, b) {
+                    return a.dateRemaining - b.dateRemaining;
+                })
 
-            myList.clear()
+                myList.clear()
 
-            for (var i = 0; i < array.length; i++) {
-                myList.append(array[i])
+                for (var i = 0; i < array.length; i++) {
+                    myList.append(array[i])
+                }
             }
         }
 
         function onSortByName() {
-            sortByNamePopup.fadeIn()
+            if(!tipsScreenVisible && !isSynchronisationLoadingVisible && !isSynchronisationSuccessVisible && !isSynchronisationFailedVisible){
+                sortByNamePopup.fadeIn()
 
-            var array = []
-            for (var i = 0; i < myList.count; i++) {
-                let item = myList.get(i)
-                array.push({name: item.name, dateAdded: item.dateAdded, dateRemaining: item.dateRemaining})
-            }
-
-            array.sort(function(a, b) {
-                if (a.name < b.name) {
-                    return -1;
+                var array = []
+                for (var i = 0; i < myList.count; i++) {
+                    let item = myList.get(i)
+                    array.push({name: item.name, dateAdded: item.dateAdded, dateRemaining: item.dateRemaining})
                 }
-                if (a.name > b.name) {
-                    return 1;
+
+                array.sort(function(a, b) {
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    return 0; //les noms sont égaux
+                })
+
+                myList.clear()
+
+                for (var i = 0; i < array.length; i++) {
+                    myList.append(array[i])
                 }
-                return 0; //les noms sont égaux
-            })
-
-            myList.clear()
-
-            for (var i = 0; i < array.length; i++) {
-                myList.append(array[i])
             }
         }
 
@@ -654,6 +679,7 @@ Window {
                 window.isSynchronisationSuccessVisible = true
                 window.isFooterVisible = false
             }else{
+                window.isFooterVisible = true
                 window.isSynchronisationFailedVisible = true
                 window.isFooterSortVisible = false
                 window.isFooterTipsVisible = false
@@ -691,6 +717,5 @@ Window {
             else if (dateRemaining > 90)
                 return "> 3 mois";
         }
-
     }
 }

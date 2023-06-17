@@ -5,6 +5,7 @@ from GPT import *
 import json
 from Speaker import *
 from Backend import *
+from FrogySleepThread import *
 
 class Frogy:
     def __init__(self, engine) -> None:
@@ -17,14 +18,19 @@ class Frogy:
         self.currentTipsId = 0
         self.currentSorting = "date"
         engine.rootContext().setContextProperty("backend", self.backend)
+        self.isFrogySleep = True
+        self.frogySleepThread = FrogySleepThread(self.setFrogySleep)
 
     def start(self):
         self.frogyThread.start()
+        self.frogySleepThread.start()
         if self.testMode == True:
             self.launchTests()
+        # lance le compteur
 
     def onMessageCallback(self, message):
-
+        self.frogySleepThread.restartCounter()
+        self.setFrogySleep(False)
         if self.testMode:
             gptresponse = {
                 "list": [
@@ -48,29 +54,38 @@ class Frogy:
             )
 
         # update frogy display
-        if(gptresponse["list"]):
+        try:
             for elem in gptresponse["list"]:
                 self.backend.addItem(elem)
             self.backend.sortListByDate(False)
             self.currentSorting = "date"
             self.backend.changeDisplayResultSyncScreen(True)
-        else:
-            self.backend.changeDisplayResultSyncScreen(False)
+        except:
             printDanger("Erreur lors de la lecture des réponses de GPT")
+            self.backend.changeDisplayResultSyncScreen(False)
 
         # send tips tts request
-        if(gptresponse["tips"]):
+        try:
             self.speaker.generateTips(gptresponse["tips"])
             self.backend.addTipsFunction(gptresponse["tips"])            
-        else:     
+        except:     
             printDanger("Erreur lors de la lecture des tips")
 
     def launchTests(self):
         pass
         # test = Test(self.server)
         # test.runTest()
+    
+    def setFrogySleep(self,state):
+        self.backend.displaySleepScreenFunction(state)
+        self.isFrogySleep = state
 
     def hardwareCallback(self, callback):
+        self.frogySleepThread.restartCounter()
+        if(self.isFrogySleep):
+            self.setFrogySleep(False)
+            return
+
         if(callback['input'] == 'wheel'):
             if(callback['type'] == 'rotation'):
                 if(callback['state'] == 'up'):

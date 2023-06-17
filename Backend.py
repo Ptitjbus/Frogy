@@ -17,6 +17,7 @@ class Backend(QObject):
     displayTips = Signal(int)
     displayLoadingSyncScreen = Signal()
     displayResultSyncScreen = Signal(bool)
+    displaySleepScreen = Signal(bool)
 
     def __init__(self, engine):
         super().__init__()
@@ -71,3 +72,6 @@ class Backend(QObject):
 
     def changeDisplayResultSyncScreen(self,state):
         self.displayResultSyncScreen.emit(state)
+    
+    def displaySleepScreenFunction(self, state):
+        self.displaySleepScreen.emit(state)

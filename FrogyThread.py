@@ -6,11 +6,6 @@ from Log import *
 
 class FrogyThread(threading.Thread):
 
-    RED = "\033[31m"
-    GREEN = "\033[32m"
-    YELLOW = "\033[33m"
-    RESET = "\033[0m"
-
     def __init__(self,backend):
         super().__init__()
         self.running = True

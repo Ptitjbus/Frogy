@@ -28,23 +28,24 @@ class Hardware:
     def __init__(self,callbackFunction) -> None:
         self.callbackDelegate = callbackFunction
         self.initGPIO()
+        self.last_callback_time = 0
 
     def initGPIO(self, parent=None):
 
         GPIO.add_event_detect(
-            RETURN_BTN, GPIO.BOTH, callback=self.returnCallback, bouncetime=300
+            RETURN_BTN, GPIO.RISING, callback=self.returnCallback, bouncetime=300
         )
         GPIO.add_event_detect(
             SW_PIN, GPIO.FALLING, callback=self.swCallback, bouncetime=300
         )
         GPIO.add_event_detect(
-            CLK_PIN, GPIO.BOTH, callback=self.rotationCallback, bouncetime=2
+            CLK_PIN, GPIO.RISING, callback=self.rotationCallback, bouncetime=2
         )
         GPIO.add_event_detect(
-            TIPS_BTN, GPIO.BOTH, callback=self.tipsBtnCallback, bouncetime=300
+            TIPS_BTN, GPIO.RISING, callback=self.tipsBtnCallback, bouncetime=300
         )
         GPIO.add_event_detect(
-            SORT_BTN, GPIO.BOTH, callback=self.sortBtnCallback, bouncetime=300
+            SORT_BTN, GPIO.RISING, callback=self.sortBtnCallback, bouncetime=300
         )
 
 
@@ -72,6 +73,9 @@ class Hardware:
         clkLastState = clkState
 
     def tipsBtnCallback(self, channel):
-        self.callbackDelegate({'input':'button','state':'pressed','type':'tips'})
+        current_time = time.time()
+        if current_time - self.last_callback_time > 1:  # 0.3 secondes
+            self.last_callback_time = current_time
+            self.callbackDelegate({'input':'button','state':'pressed','type':'tips'})
 
 
