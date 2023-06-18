@@ -41,6 +41,7 @@ class ServerWS(QThread):
         dt = datetime.now()
         str_date_time = dt.strftime("%H:%M:%S")
         printInfo("Client connected")
+        self.send_message('salut à tous')
         return {'client': client, 'time': str_date_time, 'state': 'connected'}
 
     # Called for every client disconnecting
@@ -57,3 +58,6 @@ class ServerWS(QThread):
         if len(message) > 200:
             message = message[:200]+'..'
         printInfo(f"Client({client['id']}) said: {message}")
+
+    def send_message(self, message):
+        self.server.send_message_to_all(message)

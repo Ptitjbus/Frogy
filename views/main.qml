@@ -470,7 +470,11 @@ Window {
                 window.isFooterVisible = false
             } else {
                 window.isSleepScreenVisible = false
-                window.isFooterVisible = window.isSynchronisationSuccessVisible
+                if(window.isSynchronisationSuccessVisible){
+                    window.isFooterVisible = false
+                }
+                window.isFooterVisible = true
+
             }
         }
 
