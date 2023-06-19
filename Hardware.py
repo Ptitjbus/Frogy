@@ -9,7 +9,6 @@ TIPS_BTN = 10
 RETURN_BTN = 5
 SORT_BTN = 6
 
-
 # Init GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(RETURN_BTN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -33,13 +32,13 @@ class Hardware:
     def initGPIO(self, parent=None):
 
         GPIO.add_event_detect(
-            RETURN_BTN, GPIO.RISING, callback=self.returnCallback, bouncetime=300
+            RETURN_BTN, GPIO.BOTH, callback=self.returnCallback, bouncetime=300
         )
         GPIO.add_event_detect(
             SW_PIN, GPIO.FALLING, callback=self.swCallback, bouncetime=300
         )
         GPIO.add_event_detect(
-            CLK_PIN, GPIO.RISING, callback=self.rotationCallback, bouncetime=2
+            CLK_PIN, GPIO.BOTH, callback=self.rotationCallback, bouncetime=2
         )
         GPIO.add_event_detect(
             TIPS_BTN, GPIO.RISING, callback=self.tipsBtnCallback, bouncetime=300

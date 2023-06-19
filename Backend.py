@@ -18,6 +18,7 @@ class Backend(QObject):
     displayLoadingSyncScreen = Signal()
     displayResultSyncScreen = Signal(bool)
     displaySleepScreen = Signal(bool)
+    displayAlertScreen = Signal(bool, list)
 
     def __init__(self, engine):
         super().__init__()
@@ -75,3 +76,6 @@ class Backend(QObject):
     
     def displaySleepScreenFunction(self, state):
         self.displaySleepScreen.emit(state)
+
+    def displayAlertScreenFunction(self, state, alertItems):
+        self.displayAlertScreen.emit(state,alertItems)

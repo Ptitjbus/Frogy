@@ -4,8 +4,6 @@ from pathlib import Path
 from Frogy import Frogy
 from PySide2.QtGui import QGuiApplication
 from PySide2.QtQml import QQmlApplicationEngine
-from Hardware import *
-from wsServer import *
 
 
 def main():
@@ -16,11 +14,6 @@ def main():
     # init froggy
     frogy = Frogy(engine)
     frogy.start()
-
-    # hardware controller
-    Hardware(frogy.hardwareCallback)
-    ServerWS(frogy.onMessageCallback)
-
 
     # init the display
     qml_file = Path(__file__).resolve().parent / "./views/main.qml"

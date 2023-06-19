@@ -11,6 +11,8 @@ class FrogyThread(threading.Thread):
         self.running = True
         self.backend = backend
         self.emote = "idle"
+        self.isAlert = False
+        self.alertItems = []
         
     def run(self):
         printWarning("Frogy thread started")
@@ -25,17 +27,21 @@ class FrogyThread(threading.Thread):
             if frogyData != None:
                 for item in frogyData:
                     daysRemaining = self.calculateDays(item['dateAdded'], currentDate, item['date'])
+                    daysRemaining= daysRemaining -1
                     updatedItem = json.dumps({'name': item['name'], 'dateAdded': item['dateAdded'], 'dateRemaining': daysRemaining})
                     updatedList.append(updatedItem)
                     if(daysRemaining <= 0):
-                        print(daysRemaining, item['name'])
                         self.emote = "exclamation"
+                        self.alertItems.append(item['name'])
+                        self.isAlert = True
+                    else:
+                        self.isAlert = False
                 
                 if(len(updatedList) > 0):
                     self.backend.updateListFunction(updatedList) #met à jours la liste dans froggy 
 
             self.backend.changeFrogyFace(self.emote)
-            time.sleep(60*60) #toutes les heures
+            time.sleep(5) #toutes les heures
 
     def stop(self):
         if(self.running):

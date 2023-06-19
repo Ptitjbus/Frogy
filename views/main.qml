@@ -27,7 +27,9 @@ Window {
     property var isFooterVisible : false
 
     property var isSleepScreenVisible: true
-
+    property var isAlertScreenVisible: false
+    property var alertScreenSentence: ""
+    
     RowLayout {
         anchors.fill: parent
 
@@ -440,6 +442,7 @@ Window {
     SynchronisationSuccess{isVisible:isSynchronisationSuccessVisible}
     SynchronisationFailed{isVisible:isSynchronisationFailedVisible}
     SleepScreen{isVisible:isSleepScreenVisible}
+    AlertSleepScreen{isVisible:isAlertScreenVisible; alertText: alertScreenSentence}
 
     Footer {
         visible: isFooterVisible;
@@ -470,6 +473,36 @@ Window {
                 window.isFooterVisible = false
             } else {
                 window.isSleepScreenVisible = false
+                if(window.isSynchronisationSuccessVisible){
+                    window.isFooterVisible = false
+                }
+                window.isFooterVisible = true
+
+            }
+        }
+
+        function onDisplayAlertScreen(state, alertItems){
+            var sentence = ""
+            if(alertItems.count > 1){
+                for (var i = 0; i < alertItems.count; i++) {
+                    
+                    if(i == alertItems.count -1){
+                        sentence = sentence + alertItems[i] + " "
+                    }else{
+                        sentence = sentence + alertItems[i] + ", "
+                    }
+                }
+                sentence = sentence + "ne sont peut être plus commestibles, tu devrais vérifier ! "
+            }else{
+                sentence = `${alertItems[0]} n'est peut être plus commestible tu devrais vérifier`
+            }
+            
+            window.alertScreenSentence = sentence
+            if(state){
+                window.isAlertScreenVisible = true
+                window.isFooterVisible = false
+            } else {
+                window.isAlertScreenVisible = false
                 if(window.isSynchronisationSuccessVisible){
                     window.isFooterVisible = false
                 }

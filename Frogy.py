@@ -6,6 +6,8 @@ import json
 from Speaker import *
 from Backend import *
 from FrogySleepThread import *
+from Hardware import *
+from wsServer import *
 
 class Frogy:
     def __init__(self, engine) -> None:
@@ -19,7 +21,10 @@ class Frogy:
         self.currentSorting = "date"
         engine.rootContext().setContextProperty("backend", self.backend)
         self.isFrogySleep = True
+        self.isFrogyAlert = False
         self.frogySleepThread = FrogySleepThread(self.setFrogySleep)
+        self.hardware = Hardware(self.hardwareCallback)
+        self.server = ServerWS(self.onMessageCallback)
 
     def start(self):
         self.frogyThread.start()
@@ -31,6 +36,7 @@ class Frogy:
     def onMessageCallback(self, message):
         self.frogySleepThread.restartCounter()
         self.setFrogySleep(False)
+        error = False
         if self.testMode:
             gptresponse = {
                 "list": [
@@ -63,6 +69,7 @@ class Frogy:
         except:
             printDanger("Erreur lors de la lecture des réponses de GPT")
             self.backend.changeDisplayResultSyncScreen(False)
+            error = True
 
         # send tips tts request
         try:
@@ -70,6 +77,12 @@ class Frogy:
             self.backend.addTipsFunction(gptresponse["tips"])            
         except:     
             printDanger("Erreur lors de la lecture des tips")
+            error = True
+
+        if(error):
+            self.sendMessage('syncFailed')
+        else:
+            self.sendMessage('syncSucceed')
 
     def launchTests(self):
         pass
@@ -77,12 +90,16 @@ class Frogy:
         # test.runTest()
     
     def setFrogySleep(self,state):
-        self.backend.displaySleepScreenFunction(state)
-        self.isFrogySleep = state
+        if(self.frogyThread.isAlert):
+            self.backend.displayAlertScreenFunction(state,  self.frogyThread.alertItems)
+            self.isFrogyAlert = state
+        else:
+            self.backend.displaySleepScreenFunction(state)
+            self.isFrogySleep = state
 
     def hardwareCallback(self, callback):
         self.frogySleepThread.restartCounter()
-        if(self.isFrogySleep):
+        if(self.isFrogySleep or self.isFrogyAlert):
             self.setFrogySleep(False)
             return
 
@@ -117,3 +134,6 @@ class Frogy:
                 elif(self.currentSorting == "name"):
                     self.backend.sortListByDate(True)
                     self.currentSorting = "date"
+    
+    def sendMessage(self,message):
+        self.server.send_message(message)

@@ -13,7 +13,7 @@ class FrogySleepThread(threading.Thread):
     def run(self):
         printWarning("Frogy thread started")
         while self.running:
-            if time.time() - self.start_time >= 2*60:  # Si plus de 2 minutes se sont écoulées
+            if time.time() - self.start_time >= 20:  # Si plus de 2 minutes se sont écoulées
                 self.callBackFunciton(True)
             time.sleep(1)
 
