@@ -36,7 +36,6 @@ class Frogy:
     def onMessageCallback(self, message):
         self.frogySleepThread.restartCounter()
         self.setFrogySleep(False)
-        error = False
         if self.testMode:
             gptresponse = {
                 "list": [
@@ -58,7 +57,6 @@ class Frogy:
             gptresponse = self.gpt.convertList(
                 messageResult["date"], messageResult["list"]
             )
-
         # update frogy display
         try:
             for elem in gptresponse["list"]:
@@ -66,23 +64,13 @@ class Frogy:
             self.backend.sortListByDate(False)
             self.currentSorting = "date"
             self.backend.changeDisplayResultSyncScreen(True)
+            self.speaker.generateTips(gptresponse["tips"])
+            self.backend.addTipsFunction(gptresponse["tips"])
+            self.sendMessage('syncSucceed')  
         except:
             printDanger("Erreur lors de la lecture des réponses de GPT")
             self.backend.changeDisplayResultSyncScreen(False)
-            error = True
-
-        # send tips tts request
-        try:
-            self.speaker.generateTips(gptresponse["tips"])
-            self.backend.addTipsFunction(gptresponse["tips"])            
-        except:     
-            printDanger("Erreur lors de la lecture des tips")
-            error = True
-
-        if(error):
             self.sendMessage('syncFailed')
-        else:
-            self.sendMessage('syncSucceed')
 
     def launchTests(self):
         pass
@@ -137,3 +125,4 @@ class Frogy:
     
     def sendMessage(self,message):
         self.server.send_message(message)
+        printInfo('Envoi du message' + message)

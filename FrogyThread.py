@@ -27,7 +27,6 @@ class FrogyThread(threading.Thread):
             if frogyData != None:
                 for item in frogyData:
                     daysRemaining = self.calculateDays(item['dateAdded'], currentDate, item['date'])
-                    daysRemaining= daysRemaining -1
                     updatedItem = json.dumps({'name': item['name'], 'dateAdded': item['dateAdded'], 'dateRemaining': daysRemaining})
                     updatedList.append(updatedItem)
                     if(daysRemaining <= 0):
@@ -41,7 +40,7 @@ class FrogyThread(threading.Thread):
                     self.backend.updateListFunction(updatedList) #met à jours la liste dans froggy 
 
             self.backend.changeFrogyFace(self.emote)
-            time.sleep(5) #toutes les heures
+            time.sleep(60 * 60) #toutes les heures
 
     def stop(self):
         if(self.running):

@@ -41,7 +41,6 @@ class ServerWS(QThread):
         dt = datetime.now()
         str_date_time = dt.strftime("%H:%M:%S")
         printInfo("Client connected")
-        self.send_message('salut à tous')
         return {'client': client, 'time': str_date_time, 'state': 'connected'}
 
     # Called for every client disconnecting

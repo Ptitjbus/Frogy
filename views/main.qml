@@ -381,13 +381,15 @@ Window {
             // Le premier rectangle
             Rectangle {
                 id: noChoice
-                width: infoPopup.currentIndex == 0 ? 400 : 300
-                height: infoPopup.currentIndex == 0 ? 75 : 50
+                width: infoPopup.width -50
+                height: 75
                 color: "#FBF4E8"
                 anchors.top: popUpLabel.bottom
                 anchors.topMargin: 50
-                anchors.right: popUpLabel.right
                 radius:5
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                border.width: infoPopup.currentIndex == 0 ? 2 : 0 
+                border.color: "#ED6A58"
 
                 // Le Texte dans le rectangle
                 Text {
@@ -402,19 +404,22 @@ Window {
             // Le deuxième rectangle
             Rectangle {
                 id: yesChoice
-                width: infoPopup.currentIndex == 1 ? 400 : 300
-                height: infoPopup.currentIndex == 1 ? 75 : 50
-                color: "#ED6A58"
+                // width: infoPopup.currentIndex == 1 ? 400 : 300
+                width: infoPopup.width -50
+                height: 75
+                color: "#FBF4E8"
                 anchors.top: noChoice.bottom
                 anchors.topMargin: 10
-                anchors.right: popUpLabel.right
                 radius:5
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                border.width: infoPopup.currentIndex == 1 ? 2 : 0 
+                border.color: "#ED6A58"
 
                 // Le Texte dans le rectangle
                 Text {
                     text: "Oui, retirer"
                     anchors.centerIn: parent
-                    color: "#FDF3E8"
+                    color: "#ED6A58"
                     font.bold: true
                     font.pixelSize: 25
                 }
@@ -468,6 +473,7 @@ Window {
         }
 
         function onDisplaySleepScreen(state){
+            infoPopup.close()
             if(state){
                 window.isSleepScreenVisible = true
                 window.isFooterVisible = false
@@ -482,6 +488,7 @@ Window {
         }
 
         function onDisplayAlertScreen(state, alertItems){
+            infoPopup.close()
             var sentence = ""
             if(alertItems.count > 1){
                 for (var i = 0; i < alertItems.count; i++) {
