@@ -25,6 +25,7 @@ class Frogy:
         self.frogySleepThread = FrogySleepThread(self.setFrogySleep)
         self.hardware = Hardware(self.hardwareCallback)
         self.server = ServerWS(self.onMessageCallback)
+        self.isTestAlert = False
 
     def start(self):
         self.frogyThread.start()
@@ -34,6 +35,13 @@ class Frogy:
         # lance le compteur
 
     def onMessageCallback(self, message):
+
+        if(message == "testAlert"):
+            self.backend.displayAlertScreenFunction(True,  ['Abricot'])
+            self.isFrogyAlert = True
+            self.isTestAlert = True
+            return
+
         self.frogySleepThread.restartCounter()
         self.setFrogySleep(False)
         if self.testMode:
@@ -64,9 +72,9 @@ class Frogy:
             self.backend.sortListByDate(False)
             self.currentSorting = "date"
             self.backend.changeDisplayResultSyncScreen(True)
+            self.sendMessage('syncSucceed')  
             self.speaker.generateTips(gptresponse["tips"])
             self.backend.addTipsFunction(gptresponse["tips"])
-            self.sendMessage('syncSucceed')  
         except:
             printDanger("Erreur lors de la lecture des réponses de GPT")
             self.backend.changeDisplayResultSyncScreen(False)
@@ -78,9 +86,10 @@ class Frogy:
         # test.runTest()
     
     def setFrogySleep(self,state):
-        if(self.frogyThread.isAlert):
+        if(self.frogyThread.isAlert or self.isTestAlert):
             self.backend.displayAlertScreenFunction(state,  self.frogyThread.alertItems)
             self.isFrogyAlert = state
+            self.isTestAlert = False
         else:
             self.backend.displaySleepScreenFunction(state)
             self.isFrogySleep = state
