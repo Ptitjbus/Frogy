@@ -499,7 +499,7 @@ Window {
                         sentence = sentence + alertItems[i] + ", "
                     }
                 }
-                sentence = sentence + "ne sont peut être plus commestibles, tu devrais vérifier ! "
+                sentence = "Les" + sentence + "ne sont peut être plus commestibles, tu devrais vérifier ! "
             }else{
                 sentence = `${alertItems[0]} n'est peut être plus commestible tu devrais vérifier`
             }
